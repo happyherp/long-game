@@ -8,7 +8,7 @@ const width = 800 - margin.left - margin.right
 const height = 300 - margin.top - margin.bottom
 
 export function PopulationChart() {
-  const { colony } = useGameStore()
+  const { federation, selectedColonyId } = useGameStore()
   const svgRef = useRef<SVGSVGElement>(null)
   const initialized = useRef(false)
 
@@ -32,7 +32,10 @@ export function PopulationChart() {
 
   // Update data and axes whenever history changes.
   useEffect(() => {
-    if (!svgRef.current || !colony || colony.history.length === 0) return
+    if (!svgRef.current || !federation || selectedColonyId === null) return
+
+    const colony = federation.colonies.find(c => c.id === selectedColonyId)
+    if (!colony || colony.history.length === 0) return
 
     const svg = d3.select(svgRef.current)
     const history: YearSnapshot[] = colony.history
@@ -54,9 +57,9 @@ export function PopulationChart() {
     )
     
     svg.select<SVGGElement>('.y-axis').call(d3.axisLeft(yScale))
-  }, [colony])
+  }, [federation, selectedColonyId])
 
-  if (!colony) return null
+  if (!federation || selectedColonyId === null) return null
 
   return (
     <div className="bg-white shadow p-4 rounded mb-4">

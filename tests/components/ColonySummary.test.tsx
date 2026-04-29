@@ -3,36 +3,68 @@ import { render, screen } from '@testing-library/react'
 import { ColonySummary } from '../../src/components/ColonySummary'
 import { useGameStore } from '../../src/store/gameStore'
 import { makeColony } from './testUtils'
+import { Federation } from '../../src/engine/types'
 
 vi.mock('../../src/store/gameStore')
 const mockStore = vi.mocked(useGameStore)
 
 beforeEach(() => { vi.clearAllMocks() })
 
+function makeFederation(overrides = {}) {
+  const colony = makeColony(overrides)
+  return {
+    year: 1975,
+    colonies: [colony],
+    modernWest: { willingness: 1.0 },
+    pendingSchisms: [],
+    history: [],
+  } as Federation
+}
+
 describe('ColonySummary', () => {
-  it('renders nothing when colony is null', () => {
-    mockStore.mockReturnValue({ colony: null } as any)
+  it('renders nothing when federation is null', () => {
+    mockStore.mockReturnValue({ federation: null, selectedColonyId: null } as any)
     const { container } = render(<ColonySummary />)
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('renders population count', () => {
-    mockStore.mockReturnValue({ colony: makeColony() } as any)
+  it('renders nothing when selectedColonyId is null', () => {
+    const federation = makeFederation()
+    mockStore.mockReturnValue({ federation, selectedColonyId: null } as any)
+    const { container } = render(<ColonySummary />)
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('renders colony summary', () => {
+    const federation = makeFederation()
+    mockStore.mockReturnValue({
+      federation,
+      selectedColonyId: federation.colonies[0].id,
+    } as any)
     render(<ColonySummary />)
     expect(screen.getByText('Colony Summary')).toBeInTheDocument()
-    expect(screen.getByText('Population')).toBeInTheDocument()
-    // population size = 3 from makeColony()
-    expect(screen.getByText('3')).toBeInTheDocument()
+    expect(screen.getByText('Colony Population')).toBeInTheDocument()
+    expect(screen.getByText('Federation Total')).toBeInTheDocument()
   })
 
   it('renders treasury value', () => {
-    mockStore.mockReturnValue({ colony: makeColony({ treasury: 75000 }) } as any)
+    const federation = makeFederation({ treasury: 75000 })
+    mockStore.mockReturnValue({
+      federation,
+      selectedColonyId: federation.colonies[0].id,
+    } as any)
     render(<ColonySummary />)
-    expect(screen.getByText('$75,000')).toBeInTheDocument()
+    // Should find 2 elements: Colony Treasury and Federation Treasury
+    const treasuryElements = screen.getAllByText('$75,000')
+    expect(treasuryElements).toHaveLength(2)
   })
 
   it('does not show last year section when history is empty', () => {
-    mockStore.mockReturnValue({ colony: makeColony({ history: [] }) } as any)
+    const federation = makeFederation({ history: [] })
+    mockStore.mockReturnValue({
+      federation,
+      selectedColonyId: federation.colonies[0].id,
+    } as any)
     render(<ColonySummary />)
     expect(screen.queryByText('Last Year')).not.toBeInTheDocument()
   })
@@ -48,7 +80,11 @@ describe('ColonySummary', () => {
       deaths: 1,
       departures: 0,
     }]
-    mockStore.mockReturnValue({ colony: makeColony({ history }) } as any)
+    const federation = makeFederation({ history })
+    mockStore.mockReturnValue({
+      federation,
+      selectedColonyId: federation.colonies[0].id,
+    } as any)
     render(<ColonySummary />)
     expect(screen.getByText('Last Year')).toBeInTheDocument()
     expect(screen.getByText('Births')).toBeInTheDocument()

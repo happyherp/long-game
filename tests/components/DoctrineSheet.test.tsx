@@ -44,7 +44,7 @@ describe('DoctrineSheet', () => {
     } as any)
     render(<DoctrineSheet />)
     expect(screen.getByText('Smartphones')).toBeInTheDocument()
-    expect(screen.getByText('English Schooling')).toBeInTheDocument()
+    expect(screen.getByText('English School')).toBeInTheDocument()
     expect(screen.getByText('Plain Dress')).toBeInTheDocument()
     expect(screen.getByText('Marriage Age')).toBeInTheDocument()
   })
@@ -59,8 +59,9 @@ describe('DoctrineSheet', () => {
     render(<DoctrineSheet />)
     // Find the Smartphones section, then get the button within it
     const smartphoneText = screen.getByText('Smartphones')
-    const section = smartphoneText.closest('div')
-    const button = within(section!).getByRole('button')
+    const innerDiv = smartphoneText.closest('div')
+    const outerDiv = innerDiv?.parentElement // The flex container div
+    const button = within(outerDiv!).getByRole('button')
     expect(button).toHaveTextContent('No')
   })
 
@@ -73,8 +74,9 @@ describe('DoctrineSheet', () => {
     } as any)
     render(<DoctrineSheet />)
     const smartphoneText = screen.getByText('Smartphones')
-    const section = smartphoneText.closest('div')
-    const button = within(section!).getByRole('button')
+    const innerDiv = smartphoneText.closest('div')
+    const outerDiv = innerDiv?.parentElement
+    const button = within(outerDiv!).getByRole('button')
     expect(button).toHaveTextContent('Yes')
   })
 
@@ -88,8 +90,9 @@ describe('DoctrineSheet', () => {
     } as any)
     render(<DoctrineSheet />)
     const smartphoneText = screen.getByText('Smartphones')
-    const section = smartphoneText.closest('div')
-    const button = within(section!).getByRole('button')
+    const innerDiv = smartphoneText.closest('div')
+    const outerDiv = innerDiv?.parentElement
+    const button = within(outerDiv!).getByRole('button')
     fireEvent.click(button)
     expect(setDoctrineForColony).toHaveBeenCalledWith(
       federation.colonies[0].id,

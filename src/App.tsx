@@ -8,33 +8,32 @@ import { GameOverScreen } from './components/GameOverScreen'
 import { loadGame, saveGame, deleteGame } from './persistence/db'
 
 export default function App() {
-  const { colony, seed, newGame } = useGameStore()
+  const { federation, seed, newGame, loadGame: loadToStore, gameOver } = useGameStore()
 
   useEffect(() => {
     const initGame = async () => {
-      const { newGame: start, loadGame: restore } = useGameStore.getState()
       try {
         const saved = await loadGame()
         if (saved) {
-          restore(saved.colony, saved.seed)
+          loadToStore(saved.federation, saved.seed)
         } else {
-          start()
+          newGame()
         }
       } catch (error) {
         console.error('Failed to load saved game:', error)
-        start()
+        newGame()
       }
     }
     initGame()
   }, [])
 
   useEffect(() => {
-    if (colony) {
-      saveGame(seed, colony)
+    if (federation) {
+      saveGame(federation, seed)
     }
-  }, [colony, seed])
+  }, [federation, seed])
 
-  if (!colony) {
+  if (!federation) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

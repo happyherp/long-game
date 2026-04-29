@@ -43,7 +43,7 @@ export async function loadGame(): Promise<SaveStateV2 | null> {
     if (!save) return null
 
     // Check if it's V1 and migrate
-    if (save.version === 1) {
+    if (save.version === 1 as any) {
       const v1Save = save as unknown as SaveStateV1
       const v2Save = migrateV1toV2(v1Save)
       // Save the migrated version

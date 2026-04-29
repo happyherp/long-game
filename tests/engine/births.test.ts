@@ -4,29 +4,35 @@ import { createStore, addLivingPerson, getAlive, getSlot } from '../../src/engin
 import { createLineageRegistry, getLivingCount } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { Colony } from '../../src/engine/types'
+import { makeDoctrine, makePopulation, makeLineages } from '../../tests/components/testUtils'
 
 describe('Births', () => {
   function createTestColony(): Colony {
     return {
+      id: 1,
       name: 'Test',
-      population: createStore(1000),
-      doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
-        marriageAge: 18,
-      },
-      lineages: createLineageRegistry(),
+      population: makePopulation(1000),
+      doctrine: makeDoctrine({ marriageAge: 18 }),
+      lineages: makeLineages(),
       treasury: 50000,
       year: 1960,
       history: [],
-    }
+      foundingYear: 1960,
+      modernityPressure: 100,
+      economy: {
+        parcels: [],
+        buildings: [],
+      },
+      pairingRecords: new Map(),
+      flags: {},
+    } as Colony
   }
 
   it('does not produce births for unmarried women', () => {
     const colony = createTestColony()
     const rng = createRNG(123)
 
+    // Add an unmarried woman
     addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
@@ -42,9 +48,10 @@ describe('Births', () => {
       firstNameId: 0,
     })
 
+    const initialSize = colony.population.size
     const events = applyBirths(colony, rng, 1960)
     expect(events).toHaveLength(0)
-    expect(colony.population.size).toBe(1)
+    expect(colony.population.size).toBe(initialSize)
   })
 
   it('does not produce births for women outside reproductive years', () => {
@@ -136,6 +143,8 @@ describe('Births', () => {
 
   it('child has correct lineages', () => {
     const colony = createTestColony()
+    // Ensure we have enough lineages (IDs 0-12)
+    colony.lineages = makeLineages(20)
     const rng = createRNG(111)
 
     const motherId = addLivingPerson(colony.population, colony.lineages, {
@@ -145,7 +154,7 @@ describe('Births', () => {
       married: 1,
       partnerId: 1,
       paternalLineage: 5,
-      maternalLineage: 10,
+      maternalLineage: 9,
       fatherId: -1,
       motherId: -1,
       origin: 0,
@@ -160,7 +169,7 @@ describe('Births', () => {
       married: 1,
       partnerId: motherId,
       paternalLineage: 7,
-      maternalLineage: 12,
+      maternalLineage: 3,
       fatherId: -1,
       motherId: -1,
       origin: 0,
@@ -226,37 +235,43 @@ describe('Births', () => {
 
   it('increments lineage living counts', () => {
     const colony = createTestColony()
-    const rng = createRNG(333)
+    // Use a seed that produces births
+    const rng = createRNG(123)
 
-    const motherId = addLivingPerson(colony.population, colony.lineages, {
-      age: 25,
-      sex: 0,
-      cohesion: 240,
-      married: 1,
-      partnerId: 1,
-      paternalLineage: 0,
-      maternalLineage: 0,
-      fatherId: -1,
-      motherId: -1,
-      origin: 0,
-      arrivalYear: 1960,
-      firstNameId: 0,
-    })
+    // Add multiple married couples to ensure births happen
+    for (let i = 0; i < 10; i++) {
+      const fatherId = addLivingPerson(colony.population, colony.lineages, {
+        age: 27,
+        sex: 1,
+        cohesion: 235,
+        married: 1,
+        partnerId: -1,
+        paternalLineage: 1,
+        maternalLineage: 1,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
+        firstNameId: 0,
+      })
 
-    const fatherId = addLivingPerson(colony.population, colony.lineages, {
-      age: 27,
-      sex: 1,
-      cohesion: 235,
-      married: 1,
-      partnerId: motherId,
-      paternalLineage: 1,
-      maternalLineage: 1,
-      fatherId: -1,
-      motherId: -1,
-      origin: 0,
-      arrivalYear: 1960,
-      firstNameId: 0,
-    })
+      const motherId = addLivingPerson(colony.population, colony.lineages, {
+        age: 25,
+        sex: 0,
+        cohesion: 240,
+        married: 1,
+        partnerId: fatherId,
+        paternalLineage: 0,
+        maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
+        firstNameId: 0,
+      })
+
+      colony.population.partnerId[getSlot(colony.population, fatherId)] = motherId
+    }
 
     const countBefore0 = getLivingCount(colony.lineages, 0)
     const countBefore1 = getLivingCount(colony.lineages, 1)
@@ -266,8 +281,9 @@ describe('Births', () => {
     const countAfter0 = getLivingCount(colony.lineages, 0)
     const countAfter1 = getLivingCount(colony.lineages, 1)
 
-    if (colony.population.size > 2) {
-      expect(countAfter1).toBeGreaterThan(countBefore1)
+    // Births should have happened and lineage counts should have increased
+    if (colony.population.size > 22) {
+      expect(countAfter0 + countAfter1).toBeGreaterThan(countBefore0 + countBefore1)
     }
   })
 

@@ -3,21 +3,22 @@ import { generateFoundingColony } from '../../src/engine/founding'
 import { tick } from '../../src/engine/tick'
 import { createRNG } from '../../src/engine/rng'
 import { getAlive } from '../../src/engine/population'
+import { makeDoctrine } from '../../tests/components/testUtils'
 
 describe('Determinism', () => {
   it('same seed produces identical state after 10 ticks', () => {
     const seed = 12345
     const doctrineSequence = [
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: false, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: false, marriageAge: 20 },
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 17 },
+      makeDoctrine({ smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 }),
+      makeDoctrine({ smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 }),
+      makeDoctrine({ smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 }),
+      makeDoctrine({ smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 }),
+      makeDoctrine({ smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 }),
+      makeDoctrine({ smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 }),
+      makeDoctrine({ smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 }),
+      makeDoctrine({ smartphones: true, englishSchool: true, plainDress: false, marriageAge: 19 }),
+      makeDoctrine({ smartphones: true, englishSchool: true, plainDress: false, marriageAge: 20 }),
+      makeDoctrine({ smartphones: false, englishSchool: false, plainDress: true, marriageAge: 17 }),
     ]
 
     const run1 = generateFoundingColony(createRNG(seed), 'Test1')
@@ -27,8 +28,8 @@ describe('Determinism', () => {
     const rng2 = createRNG(seed)
 
     for (let year = 0; year < 10; year++) {
-      run1.doctrine = { ...doctrineSequence[year] }
-      run2.doctrine = { ...doctrineSequence[year] }
+      run1.doctrine = doctrineSequence[year]
+      run2.doctrine = doctrineSequence[year]
 
       tick(run1, rng1.fork(`tick-${year}`))
       tick(run2, rng2.fork(`tick-${year}`))

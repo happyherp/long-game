@@ -9,7 +9,7 @@ export function Header() {
   const totalPop = federation.colonies.reduce((sum, c) => sum + c.population.size, 0)
   const totalTreasury = federation.colonies.reduce((sum, c) => sum + c.treasury, 0)
   const avgModernityPressure = federation.colonies.length > 0
-    ? federation.colonies.reduce((sum, c) => sum + c.modernityPressure, 0) / federation.colonies.length
+    ? federation.colonies.reduce((sum, c) => sum + (c.modernityPressure || 0), 0) / federation.colonies.length
     : 0
 
   return (

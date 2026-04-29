@@ -1,4 +1,4 @@
-import { Colony, Doctrine, PopulationStore, LineageRegistry } from '../../src/engine/types'
+import { Colony, Doctrine, PopulationStore, LineageRegistry, YearSnapshot, Federation } from '../../src/engine/types'
 
 export function makePopulation(size = 3): PopulationStore {
   const capacity = Math.max(size, 10)
@@ -30,28 +30,62 @@ export function makePopulation(size = 3): PopulationStore {
 }
 
 export function makeDoctrine(overrides: Partial<Doctrine> = {}): Doctrine {
-  return {
-    smartphones: false,
-    englishSchool: false,
-    plainDress: true,
+  const base: Doctrine = {
+    marriageDoctrine: 'courtship',
     marriageAge: 19,
-    ...overrides,
+    marriageOutside: 'forbidden',
+    baptismAge: 'infant',
+    shunning: false,
+    worshipLanguage: 'plautdietsch',
+    plainDress: true,
+    headCovering: true,
+    beardForMarried: true,
+    sundayObservance: true,
+    englishSchool: false,
+    higherEdMen: 'forbidden',
+    higherEdWomen: 'forbidden',
+    smartphones: false,
+    motorizedFarming: false,
+    gridElectricity: false,
+    outsideTrade: 'restricted',
+    inflowPolicy: 'vetted',
   }
+  return { ...base, ...overrides }
 }
 
-export function makeLineages(): LineageRegistry {
-  return { surnames: ['Miller'], livingCount: new Uint32Array(1).fill(3) }
+export function makeLineages(numSurnames = 10): LineageRegistry {
+  return { surnames: Array(numSurnames).fill('Surname'), livingCount: new Uint32Array(numSurnames).fill(3) }
 }
 
 export function makeColony(overrides: Partial<Colony> = {}): Colony {
-  return {
+  const base: Colony = {
+    id: 1,
     name: 'Cayo',
-    year: 1975,
-    treasury: 50000,
     population: makePopulation(),
     doctrine: makeDoctrine(),
     lineages: makeLineages(),
+    treasury: 50000,
+    year: 1975,
     history: [],
-    ...overrides,
+    foundingYear: 1960,
+    modernityPressure: 100,
+    economy: {
+      parcels: [],
+      buildings: [],
+    },
+    pairingRecords: new Map(),
+    flags: {},
   }
+  return { ...base, ...overrides } as Colony
+}
+
+export function makeFederation(overrides: Partial<Federation> = {}): Federation {
+  const base: Federation = {
+    year: 1975,
+    colonies: [makeColony()],
+    modernWest: { willingness: 1.0 },
+    pendingSchisms: [],
+    history: [],
+  }
+  return { ...base, ...overrides }
 }

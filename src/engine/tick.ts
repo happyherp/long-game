@@ -16,7 +16,7 @@ export function tick(colony: Colony, rng: RNG): TickResult {
 
   const deathEvents = applyDeaths(colony.population, colony.lineages, rng.fork('deaths'), year)
 
-  const pairEvents = pairUp(colony, rng.fork('pairing'), year)
+  const pairEvents = pairUp(colony, rng.fork('pairing'))
 
   const birthEvents = applyBirths(colony, rng.fork('births'), year)
 
