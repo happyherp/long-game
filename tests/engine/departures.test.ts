@@ -1,25 +1,25 @@
 import { describe, it, expect } from 'vitest'
 import { applyDepartures, departureProbability } from '../../src/engine/departures'
-import { createStore, addLivingPerson, getAlive } from '../../src/engine/population'
+import { createStore, addLivingPerson } from '../../src/engine/population'
 import { createLineageRegistry } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
-import { Colony } from '../../src/engine/types'
+import { Colony, DEFAULT_DOCTRINE } from '../../src/engine/types'
 
 describe('Departures', () => {
   function createTestColony(): Colony {
     return {
+      id: 'test',
       name: 'Test',
       population: createStore(100),
-      doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
-        marriageAge: 18,
-      },
+      doctrine: { ...DEFAULT_DOCTRINE },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      modernityPressure: 0,
+      economy: { parcels: [], buildings: [] },
+      pairingCoefficients: new Map(),
+      flags: {},
     }
   }
 
@@ -81,9 +81,6 @@ describe('Departures', () => {
     const colony2 = createTestColony()
     colony2.doctrine.smartphones = true
 
-    const rng1 = createRNG(789)
-    const rng2 = createRNG(789)
-
     const prob1 = departureProbability(
       { age: 20, cohesion: 100 },
       null,
@@ -99,16 +96,19 @@ describe('Departures', () => {
   })
 
   it('partner with high cohesion suppresses departure', () => {
+    const baseDoc = { ...DEFAULT_DOCTRINE, smartphones: false, englishSchool: false }
+    const withSmartphones = { ...DEFAULT_DOCTRINE, smartphones: true }
+
     const baseProb = departureProbability(
       { age: 20, cohesion: 100 },
       null,
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 18 },
+      baseDoc,
     )
 
     const suppressed = departureProbability(
       { age: 20, cohesion: 100 },
       { age: 22, cohesion: 240 },
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 18 },
+      baseDoc,
     )
 
     expect(suppressed).toBeLessThan(baseProb)
@@ -192,7 +192,7 @@ describe('Departures', () => {
   })
 
   it('peaks departure probability for young adults', () => {
-    const base = { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 18 }
+    const base = { ...DEFAULT_DOCTRINE }
 
     const age20 = departureProbability({ age: 20, cohesion: 100 }, null, base)
     const age15 = departureProbability({ age: 15, cohesion: 100 }, null, base)

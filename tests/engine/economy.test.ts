@@ -2,23 +2,23 @@ import { describe, it, expect } from 'vitest'
 import { updateTreasury } from '../../src/engine/economy'
 import { createStore, addLivingPerson } from '../../src/engine/population'
 import { createLineageRegistry } from '../../src/engine/lineage'
-import { Colony } from '../../src/engine/types'
+import { Colony, DEFAULT_DOCTRINE } from '../../src/engine/types'
 
 describe('Economy', () => {
   function createTestColony(): Colony {
     return {
+      id: 'test',
       name: 'Test',
       population: createStore(300),
-      doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
-        marriageAge: 19,
-      },
+      doctrine: { ...DEFAULT_DOCTRINE, marriageAge: 19 },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      modernityPressure: 0,
+      economy: { parcels: [], buildings: [] },
+      pairingCoefficients: new Map(),
+      flags: {},
     }
   }
 

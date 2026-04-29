@@ -3,23 +3,23 @@ import { applyBirths, birthProbability } from '../../src/engine/births'
 import { createStore, addLivingPerson, getAlive, getSlot } from '../../src/engine/population'
 import { createLineageRegistry, getLivingCount } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
-import { Colony } from '../../src/engine/types'
+import { Colony, DEFAULT_DOCTRINE } from '../../src/engine/types'
 
 describe('Births', () => {
   function createTestColony(): Colony {
     return {
+      id: 'test',
       name: 'Test',
       population: createStore(1000),
-      doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
-        marriageAge: 18,
-      },
+      doctrine: { ...DEFAULT_DOCTRINE },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      modernityPressure: 0,
+      economy: { parcels: [], buildings: [] },
+      pairingCoefficients: new Map(),
+      flags: {},
     }
   }
 

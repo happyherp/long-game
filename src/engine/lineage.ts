@@ -54,3 +54,12 @@ export function getTotalLivingMembers(registry: LineageRegistry): number {
   }
   return total
 }
+
+export function addInflowLineage(lineages: LineageRegistry, surname: string): number {
+  lineages.surnames.push(surname)
+  // Grow livingCount array to accommodate new surname
+  const newArr = new Uint32Array(lineages.surnames.length)
+  newArr.set(lineages.livingCount)
+  lineages.livingCount = newArr
+  return lineages.surnames.length - 1
+}

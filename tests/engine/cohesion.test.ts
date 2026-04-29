@@ -3,23 +3,23 @@ import { applyCohesionDrift } from '../../src/engine/cohesion'
 import { createStore, addLivingPerson } from '../../src/engine/population'
 import { createLineageRegistry } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
-import { Colony } from '../../src/engine/types'
+import { Colony, DEFAULT_DOCTRINE } from '../../src/engine/types'
 
 describe('Cohesion Drift', () => {
   function createTestColony(): Colony {
     return {
+      id: 'test',
       name: 'Test',
       population: createStore(100),
-      doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
-        marriageAge: 18,
-      },
+      doctrine: { ...DEFAULT_DOCTRINE },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      modernityPressure: 0,
+      economy: { parcels: [], buildings: [] },
+      pairingCoefficients: new Map(),
+      flags: {},
     }
   }
 
@@ -44,7 +44,7 @@ describe('Cohesion Drift', () => {
     })
 
     const before = colony.population.cohesion[id]
-    applyCohesionDrift(colony, rng)
+    applyCohesionDrift(colony, 1960, rng)
     const after = colony.population.cohesion[id]
 
     expect(after).toBeLessThan(before + 5)
@@ -71,7 +71,7 @@ describe('Cohesion Drift', () => {
     })
 
     const before = colony.population.cohesion[id]
-    applyCohesionDrift(colony, rng)
+    applyCohesionDrift(colony, 1960, rng)
     const after = colony.population.cohesion[id]
 
     expect(after).toBeGreaterThan(before - 5)
@@ -112,7 +112,7 @@ describe('Cohesion Drift', () => {
     })
 
     const before = colony.population.cohesion[lowCohesionId]
-    applyCohesionDrift(colony, rng)
+    applyCohesionDrift(colony, 1960, rng)
     const after = colony.population.cohesion[lowCohesionId]
 
     expect(after).toBeGreaterThan(before)
@@ -153,7 +153,7 @@ describe('Cohesion Drift', () => {
     })
 
     const before = colony.population.cohesion[highCohesionId]
-    applyCohesionDrift(colony, rng)
+    applyCohesionDrift(colony, 1960, rng)
     const after = colony.population.cohesion[highCohesionId]
 
     expect(after).toBeLessThan(before)
@@ -181,7 +181,7 @@ describe('Cohesion Drift', () => {
     })
 
     for (let i = 0; i < 10; i++) {
-      applyCohesionDrift(colony, rng.fork(`clamp-test-${i}`))
+      applyCohesionDrift(colony, 1960 + i, rng.fork(`clamp-test-${i}`))
     }
 
     expect(colony.population.cohesion[id]).toBeGreaterThanOrEqual(0)
@@ -208,7 +208,7 @@ describe('Cohesion Drift', () => {
     })
 
     const before = colony.population.cohesion[id]
-    applyCohesionDrift(colony, rng)
+    applyCohesionDrift(colony, 1960, rng)
     const after = colony.population.cohesion[id]
 
     expect(after).toBeLessThanOrEqual(before + 2)

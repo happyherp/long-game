@@ -4,23 +4,23 @@ import { createStore, addLivingPerson, addPerson, getAlive, getSlot } from '../.
 import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { tick } from '../../src/engine/tick'
-import { Colony } from '../../src/engine/types'
+import { Colony, DEFAULT_DOCTRINE } from '../../src/engine/types'
 
 describe('Metrics', () => {
   function createTestColony(): Colony {
     return {
+      id: 'test',
       name: 'Test',
       population: createStore(300),
-      doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
-        marriageAge: 18,
-      },
+      doctrine: { ...DEFAULT_DOCTRINE },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      modernityPressure: 0,
+      economy: { parcels: [], buildings: [] },
+      pairingCoefficients: new Map(),
+      flags: {},
     }
   }
 

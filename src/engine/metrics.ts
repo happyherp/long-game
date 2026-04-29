@@ -36,6 +36,7 @@ export function computeMetrics(colony: Colony): ColonyMetrics {
     cohesionAvg,
     cohesionBand,
     treasury: colony.treasury,
+    modernityPressure: colony.modernityPressure ?? 0,
     birthsThisYear,
     deathsThisYear,
     departuresThisYear,

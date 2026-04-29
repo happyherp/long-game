@@ -3,21 +3,22 @@ import { generateFoundingColony } from '../../src/engine/founding'
 import { tick } from '../../src/engine/tick'
 import { createRNG } from '../../src/engine/rng'
 import { getAlive } from '../../src/engine/population'
+import { DEFAULT_DOCTRINE, Doctrine } from '../../src/engine/types'
 
 describe('Determinism', () => {
   it('same seed produces identical state after 10 ticks', () => {
     const seed = 12345
-    const doctrineSequence = [
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: false, marriageAge: 19 },
-      { smartphones: true, englishSchool: true, plainDress: false, marriageAge: 20 },
-      { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 17 },
+    const doctrineSequence: Doctrine[] = [
+      { ...DEFAULT_DOCTRINE, smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: false, englishSchool: false, plainDress: true, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: true, englishSchool: false, plainDress: true, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: true, englishSchool: true, plainDress: true, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: true, englishSchool: true, plainDress: false, marriageAge: 19 },
+      { ...DEFAULT_DOCTRINE, smartphones: true, englishSchool: true, plainDress: false, marriageAge: 20 },
+      { ...DEFAULT_DOCTRINE, smartphones: false, englishSchool: false, plainDress: true, marriageAge: 17 },
     ]
 
     const run1 = generateFoundingColony(createRNG(seed), 'Test1')

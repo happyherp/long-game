@@ -1,4 +1,4 @@
-import { Colony, Doctrine, PopulationStore, LineageRegistry } from '../../src/engine/types'
+import { Colony, Doctrine, PopulationStore, LineageRegistry, DEFAULT_DOCTRINE } from '../../src/engine/types'
 
 export function makePopulation(size = 3): PopulationStore {
   const capacity = Math.max(size, 10)
@@ -31,10 +31,7 @@ export function makePopulation(size = 3): PopulationStore {
 
 export function makeDoctrine(overrides: Partial<Doctrine> = {}): Doctrine {
   return {
-    smartphones: false,
-    englishSchool: false,
-    plainDress: true,
-    marriageAge: 19,
+    ...DEFAULT_DOCTRINE,
     ...overrides,
   }
 }
@@ -45,6 +42,7 @@ export function makeLineages(): LineageRegistry {
 
 export function makeColony(overrides: Partial<Colony> = {}): Colony {
   return {
+    id: 'cayo',
     name: 'Cayo',
     year: 1975,
     treasury: 50000,
@@ -52,6 +50,10 @@ export function makeColony(overrides: Partial<Colony> = {}): Colony {
     doctrine: makeDoctrine(),
     lineages: makeLineages(),
     history: [],
+    modernityPressure: 0,
+    economy: { parcels: [], buildings: [] },
+    pairingCoefficients: new Map(),
+    flags: {},
     ...overrides,
   }
 }
