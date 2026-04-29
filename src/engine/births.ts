@@ -1,6 +1,7 @@
 import { Colony, GameEvent } from './types'
 import { getAlive, addLivingPerson, getSlot } from './population'
 import { RNG } from './rng'
+import { inbreedingCoefficient } from './inbreeding'
 
 function ageCurve(age: number): number {
   if (age < 16 || age > 44) return 0
@@ -62,10 +63,33 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
 
       const motherStableId = population.slotToId[motherSlot]
 
+      // Compute inbreeding coefficient for this pairing
+      const inbreedingCoef = inbreedingCoefficient(fatherStableId, motherStableId, population)
+
+      // Child starting cohesion reduced by coefficient * 30
+      const childCohesionWithInbreeding = Math.max(0, childCohesion - inbreedingCoef * 30)
+
+      // Infant mortality multiplier: 1 + coefficient * 4
+      const infantMortalityMultiplier = 1 + inbreedingCoef * 4
+      const mortalityRoll = rng.next()
+      const baseInfantMortality = 0.05 // Base 5% infant mortality
+      const actualMortality = baseInfantMortality * infantMortalityMultiplier
+
+      if (mortalityRoll < actualMortality) {
+        // Infant died - don't add to population
+        events.push({
+          type: 'death',
+          personId: -1, // Infant death
+          year,
+          payload: { reason: 'infantMortality', parents: { motherId: motherStableId, fatherId: fatherStableId } },
+        })
+        continue
+      }
+
       const childStableId = addLivingPerson(population, colony.lineages, {
         age: 0,
         sex: childSex,
-        cohesion: childCohesion,
+        cohesion: childCohesionWithInbreeding,
         married: 0,
         partnerId: -1,
         paternalLineage: childPaternalLineage,

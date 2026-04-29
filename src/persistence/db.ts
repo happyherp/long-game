@@ -1,55 +1,77 @@
 import { DBSchema, openDB } from 'idb'
-import { Colony } from '../engine/types'
+import { Federation } from '../engine/types'
+import { migrateV1toV2 } from '../engine/migrate'
 
-interface GameDB extends DBSchema {
+const DB_NAME = 'long-game'
+const DB_VERSION = 2
+const STORE_NAME = 'saves'
+
+// V1 types (for migration)
+interface SaveStateV1 {
+  version: 1
+  seed: number
+  colony: any // Colony with limited doctrine
+}
+
+// V2 types
+interface SaveStateV2 {
+  version: 2
+  seed: number
+  federation: Federation
+}
+
+interface GameDBV2 extends DBSchema {
   saves: {
     key: 'latest'
-    value: SaveState
+    value: SaveStateV2
   }
 }
 
-export interface SaveState {
-  version: 1
-  seed: number
-  colony: Colony
-}
-
-const DB_NAME = 'long-game'
-const DB_VERSION = 1
-const STORE_NAME = 'saves'
-
-export async function loadGame(): Promise<SaveState | null> {
+export async function loadGame(): Promise<SaveStateV2 | null> {
   try {
-    const db = await openDB<GameDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
+    const db = await openDB<GameDBV2>(DB_NAME, DB_VERSION, {
+      upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
           db.createObjectStore(STORE_NAME)
         }
+        // Note: We don't do V1->V2 migration here because we need to read the V1 data first
       },
     })
 
     const save = await db.get(STORE_NAME, 'latest')
-    return save || null
+
+    if (!save) return null
+
+    // Check if it's V1 and migrate
+    if (save.version === 1) {
+      const v1Save = save as unknown as SaveStateV1
+      const v2Save = migrateV1toV2(v1Save)
+      // Save the migrated version
+      await db.put(STORE_NAME, v2Save, 'latest')
+      return v2Save
+    }
+
+    return save as SaveStateV2
   } catch (error) {
     console.error('Failed to load game from IndexedDB:', error)
     return null
   }
 }
 
-export async function saveGame(seed: number, colony: Colony): Promise<void> {
+export async function saveGame(federation: Federation, seed: number): Promise<void> {
   try {
-    const db = await openDB<GameDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
+    const db = await openDB<GameDBV2>(DB_NAME, DB_VERSION, {
+      upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
           db.createObjectStore(STORE_NAME)
         }
       },
     })
 
-    const saveState: SaveState = {
-      version: 1,
+    const saveState: SaveStateV2 = {
+      version: 2,
       seed,
-      colony,
+      federation,
     }
 
     await db.put(STORE_NAME, saveState, 'latest')
@@ -60,9 +82,9 @@ export async function saveGame(seed: number, colony: Colony): Promise<void> {
 
 export async function deleteGame(): Promise<void> {
   try {
-    const db = await openDB<GameDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
+    const db = await openDB<GameDBV2>(DB_NAME, DB_VERSION, {
+      upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
           db.createObjectStore(STORE_NAME)
         }
       },

@@ -8,18 +8,46 @@ import { Colony } from '../../src/engine/types'
 describe('Pairing', () => {
   function createTestColony(): Colony {
     return {
+      id: 0,
       name: 'Test',
       population: createStore(100),
       doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
+        // Marriage
+        marriageDoctrine: 'courtship',
         marriageAge: 18,
+        marriageOutside: 'forbidden',
+        // Religion / visible markers
+        baptismAge: 'infant',
+        shunning: true,
+        worshipLanguage: 'plautdietsch',
+        plainDress: true,
+        headCovering: true,
+        beardForMarried: true,
+        sundayObservance: true,
+        // Education
+        englishSchool: false,
+        higherEdMen: 'forbidden',
+        higherEdWomen: 'forbidden',
+        // Technology
+        smartphones: false,
+        motorizedFarming: false,
+        gridElectricity: false,
+        // Outside contact
+        outsideTrade: 'restricted',
+        inflowPolicy: 'closed',
       },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      foundingYear: 1960,
+      modernityPressure: 0,
+      economy: {
+        parcels: [],
+        buildings: [],
+      },
+      pairingRecords: new Map(),
+      flags: {},
     }
   }
 
@@ -57,7 +85,7 @@ describe('Pairing', () => {
       firstNameId: 0,
     })
 
-    const events = pairUp(colony, rng, 1960)
+    const events = pairUp(colony, rng)
 
     expect(events).toHaveLength(1)
     expect(events[0].type).toBe('pairing')
@@ -117,11 +145,21 @@ describe('Pairing', () => {
       firstNameId: 0,
     })
 
-    const events = pairUp(colony, rng, 1960)
+    const events = pairUp(colony, rng)
 
     expect(events).toHaveLength(1)
-    expect(colony.population.partnerId[oldMaleId]).toBe(femaleId)
-    expect(colony.population.married[youngMaleId]).toBe(0)
+    // Convert stable IDs to slots for array access
+    const oldMaleSlot = colony.population.idToSlot.get(oldMaleId) ?? -1
+    const femaleSlot = colony.population.idToSlot.get(femaleId) ?? -1
+    const youngMaleSlot = colony.population.idToSlot.get(youngMaleId) ?? -1
+    
+    expect(oldMaleSlot).toBeGreaterThan(-1)
+    expect(femaleSlot).toBeGreaterThan(-1)
+    expect(youngMaleSlot).toBeGreaterThan(-1)
+    
+    expect(colony.population.partnerId[oldMaleSlot]).toBe(femaleId)
+    expect(colony.population.partnerId[femaleSlot]).toBe(oldMaleId)
+    expect(colony.population.married[youngMaleSlot]).toBe(0)
   })
 
   it('pairs by cohesion rank (highest with highest)', () => {
@@ -218,7 +256,7 @@ describe('Pairing', () => {
       }),
     ]
 
-    const events = pairUp(colony, rng, 1960)
+    const events = pairUp(colony, rng)
 
     expect(events).toHaveLength(3)
 
@@ -313,7 +351,7 @@ describe('Pairing', () => {
       }),
     ]
 
-    const events = pairUp(colony, rng, 1960)
+    const events = pairUp(colony, rng)
 
     expect(events).toHaveLength(2)
 
@@ -377,7 +415,7 @@ describe('Pairing', () => {
       firstNameId: 0,
     })
 
-    const events = pairUp(colony, rng, 1960)
+    const events = pairUp(colony, rng)
 
     expect(events).toHaveLength(1)
     expect(colony.population.partnerId[singleMaleId]).toBe(femaleId)
