@@ -7,7 +7,7 @@ type SortKey = 'name' | 'age' | 'cohesion' | 'married'
 type SortDir = 'asc' | 'desc'
 
 export interface PersonRow {
-  index: number
+  stableId: number
   firstName: string
   surname: string
   sex: number
@@ -28,23 +28,23 @@ export function PeopleList() {
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
   const [limit, setLimit] = useState(PAGE_SIZE)
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
 
   const people = useMemo<PersonRow[]>(() => {
     if (!colony) return []
     const { population, lineages } = colony
     const rows: PersonRow[] = []
-    for (let i = 0; i < population.size; i++) {
-      const sex = population.sex[i]
-      const surname = lineages.surnames[population.paternalLineage[i]] ?? '?'
+    for (let slot = 0; slot < population.size; slot++) {
+      const sex = population.sex[slot]
+      const surname = lineages.surnames[population.paternalLineage[slot]] ?? '?'
       rows.push({
-        index: i,
-        firstName: getFirstName(sex, population.firstNameId[i]),
+        stableId: population.slotToId[slot],
+        firstName: getFirstName(sex, population.firstNameId[slot]),
         surname,
         sex,
-        age: population.age[i],
-        cohesion: population.cohesion[i],
-        married: population.married[i] === 1,
+        age: population.age[slot],
+        cohesion: population.cohesion[slot],
+        married: population.married[slot] === 1,
       })
     }
     return rows
@@ -111,8 +111,6 @@ export function PeopleList() {
     if (c >= 85) return 'text-yellow-700'
     return 'text-red-700'
   }
-
-  const selectedPerson = selectedIndex !== null ? people.find((p) => p.index === selectedIndex) ?? null : null
 
   if (!colony) return null
 
@@ -206,9 +204,9 @@ export function PeopleList() {
             )}
             {visible.map((p) => (
               <tr
-                key={p.index}
+                key={p.stableId}
                 className="border-b hover:bg-blue-50 cursor-pointer"
-                onClick={() => setSelectedIndex(p.index)}
+                onClick={() => setSelectedId(p.stableId)}
               >
                 <td className="px-3 py-1.5 font-medium text-blue-700 hover:underline">
                   {p.firstName} {p.surname}
@@ -236,12 +234,12 @@ export function PeopleList() {
         </div>
       )}
 
-      {selectedPerson && (
+      {selectedId !== null && (
         <PersonDetail
-          person={selectedPerson}
+          stableId={selectedId}
           colony={colony}
-          onClose={() => setSelectedIndex(null)}
-          onSelectPerson={(idx) => setSelectedIndex(idx)}
+          onClose={() => setSelectedId(null)}
+          onSelectPerson={(id) => setSelectedId(id)}
         />
       )}
     </div>

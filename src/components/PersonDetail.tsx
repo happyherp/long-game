@@ -1,21 +1,12 @@
 import { Colony } from '../engine/types'
+import { getSlot } from '../engine/population'
 import { getFirstName } from '../engine/names'
 
-interface PersonRow {
-  index: number
-  firstName: string
-  surname: string
-  sex: number
-  age: number
-  cohesion: number
-  married: boolean
-}
-
 interface Props {
-  person: PersonRow
+  stableId: number
   colony: Colony
   onClose: () => void
-  onSelectPerson: (index: number) => void
+  onSelectPerson: (stableId: number) => void
 }
 
 function cohesionLabel(c: number) {
@@ -30,20 +21,58 @@ function cohesionColor(c: number) {
   return 'text-red-700'
 }
 
-export function PersonDetail({ person, colony, onClose, onSelectPerson }: Props) {
+interface ResolvedPerson {
+  stableId: number
+  name: string
+  alive: true
+}
+
+function resolvePerson(colony: Colony, stableId: number): ResolvedPerson | null {
+  if (stableId < 0) return null
+  const slot = getSlot(colony.population, stableId)
+  if (slot < 0) return null
+  const { population, lineages } = colony
+  const sex = population.sex[slot]
+  const firstName = getFirstName(sex, population.firstNameId[slot])
+  const surname = lineages.surnames[population.paternalLineage[slot]] ?? '?'
+  return { stableId, name: `${firstName} ${surname}`, alive: true }
+}
+
+export function PersonDetail({ stableId, colony, onClose, onSelectPerson }: Props) {
+  const slot = getSlot(colony.population, stableId)
+  if (slot < 0) return null  // person no longer in colony
+
   const { population, lineages } = colony
 
-  const paternalSurname = lineages.surnames[population.paternalLineage[person.index]] ?? '?'
-  const maternalSurname = lineages.surnames[population.maternalLineage[person.index]] ?? '?'
+  const sex = population.sex[slot]
+  const age = population.age[slot]
+  const cohesion = population.cohesion[slot]
+  const married = population.married[slot] === 1
+  const firstName = getFirstName(sex, population.firstNameId[slot])
+  const surname = lineages.surnames[population.paternalLineage[slot]] ?? '?'
 
-  const partnerId = population.partnerId[person.index]
-  const hasSpouse = person.married && partnerId >= 0 && partnerId < population.size
-  let spouse: { index: number; name: string } | null = null
-  if (hasSpouse) {
-    const spouseSex = population.sex[partnerId]
-    const spouseFirstName = getFirstName(spouseSex, population.firstNameId[partnerId])
-    const spouseSurname = lineages.surnames[population.paternalLineage[partnerId]] ?? '?'
-    spouse = { index: partnerId, name: `${spouseFirstName} ${spouseSurname}` }
+  const paternalSurname = lineages.surnames[population.paternalLineage[slot]] ?? '?'
+  const maternalSurname = lineages.surnames[population.maternalLineage[slot]] ?? '?'
+
+  const spouse = resolvePerson(colony, population.partnerId[slot])
+  const father = resolvePerson(colony, population.fatherId[slot])
+  const mother = resolvePerson(colony, population.motherId[slot])
+
+  const fatherId = population.fatherId[slot]
+  const motherId = population.motherId[slot]
+  const partnerId = population.partnerId[slot]
+
+  function PersonLink({ resolved, rawId }: { resolved: ResolvedPerson | null; rawId: number }) {
+    if (rawId < 0) return <span className="text-gray-400">Unknown</span>
+    if (!resolved) return <span className="text-gray-400">Deceased / departed</span>
+    return (
+      <button
+        className="text-blue-600 hover:underline"
+        onClick={() => onSelectPerson(resolved.stableId)}
+      >
+        {resolved.name}
+      </button>
+    )
   }
 
   return (
@@ -57,7 +86,7 @@ export function PersonDetail({ person, colony, onClose, onSelectPerson }: Props)
       >
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-lg font-bold">
-            {person.firstName} {person.surname}
+            {firstName} {surname}
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">
             ×
@@ -67,46 +96,47 @@ export function PersonDetail({ person, colony, onClose, onSelectPerson }: Props)
         <dl className="space-y-2 text-sm">
           <div className="flex justify-between">
             <dt className="text-gray-500">Gender</dt>
-            <dd>{person.sex === 1 ? 'Male' : 'Female'}</dd>
+            <dd>{sex === 1 ? 'Male' : 'Female'}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500">Age</dt>
-            <dd>{person.age}</dd>
+            <dd>{age}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500">Cohesion</dt>
-            <dd className={cohesionColor(person.cohesion)}>
-              {cohesionLabel(person.cohesion)} ({person.cohesion})
+            <dd className={cohesionColor(cohesion)}>
+              {cohesionLabel(cohesion)} ({cohesion})
             </dd>
           </div>
 
           <div className="border-t pt-2 mt-2">
             <dt className="text-gray-500 mb-1">Spouse</dt>
             <dd>
-              {spouse ? (
-                <button
-                  className="text-blue-600 hover:underline"
-                  onClick={() => onSelectPerson(spouse!.index)}
-                >
-                  {spouse.name}
-                </button>
-              ) : (
-                <span className="text-gray-400">Unmarried</span>
-              )}
+              {married
+                ? <PersonLink resolved={spouse} rawId={partnerId} />
+                : <span className="text-gray-400">Unmarried</span>}
+            </dd>
+          </div>
+
+          <div className="border-t pt-2 mt-2">
+            <dt className="text-gray-500 mb-1">Parents</dt>
+            <dd className="space-y-0.5">
+              <div>
+                <span className="text-gray-400">Father: </span>
+                <PersonLink resolved={father} rawId={fatherId} />
+              </div>
+              <div>
+                <span className="text-gray-400">Mother: </span>
+                <PersonLink resolved={mother} rawId={motherId} />
+              </div>
             </dd>
           </div>
 
           <div className="border-t pt-2 mt-2">
             <dt className="text-gray-500 mb-1">Lineage</dt>
-            <dd className="space-y-0.5">
-              <div>
-                <span className="text-gray-400">Paternal: </span>
-                <span>{paternalSurname} family</span>
-              </div>
-              <div>
-                <span className="text-gray-400">Maternal: </span>
-                <span>{maternalSurname} family</span>
-              </div>
+            <dd className="space-y-0.5 text-gray-600">
+              <div>Paternal: {paternalSurname} family</div>
+              <div>Maternal: {maternalSurname} family</div>
             </dd>
           </div>
         </dl>
