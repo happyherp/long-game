@@ -1,6 +1,6 @@
 import { Colony, PopulationStore } from './types'
-import { createStore, addPerson } from './population'
-import { createLineageRegistry, incrementLivingCount } from './lineage'
+import { createStore, addLivingPerson } from './population'
+import { createLineageRegistry } from './lineage'
 import { RNG } from './rng'
 import { FOUNDER_SURNAMES } from './names'
 
@@ -52,7 +52,7 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
         cohesion = 200 + rngCohesion.nextInt(31)
       }
 
-      const id = addPerson(population, {
+      const id = addLivingPerson(population, lineages, {
         age,
         sex,
         cohesion,
@@ -62,9 +62,6 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
         maternalLineage,
         firstNameId,
       })
-
-      incrementLivingCount(lineages, paternalLineage)
-      incrementLivingCount(lineages, maternalLineage)
 
       if (age >= 18) {
         people.push({ id, age, sex })

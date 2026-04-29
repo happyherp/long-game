@@ -1,6 +1,5 @@
 import { Colony, GameEvent } from './types'
-import { getAlive, addPerson } from './population'
-import { incrementLivingCount } from './lineage'
+import { getAlive, addLivingPerson } from './population'
 import { RNG } from './rng'
 
 function ageCurve(age: number): number {
@@ -56,7 +55,7 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
       const childPaternalLineage = population.paternalLineage[fatherId]
       const childMaternalLineage = population.maternalLineage[motherId]
 
-      const childId = addPerson(population, {
+      const childId = addLivingPerson(population, colony.lineages, {
         age: 0,
         sex: childSex,
         cohesion: childCohesion,
@@ -66,9 +65,6 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
         maternalLineage: childMaternalLineage,
         firstNameId: childFirstNameId,
       })
-
-      incrementLivingCount(colony.lineages, childPaternalLineage)
-      incrementLivingCount(colony.lineages, childMaternalLineage)
 
       events.push({
         type: 'birth',

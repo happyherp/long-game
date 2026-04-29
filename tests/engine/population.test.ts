@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import { createStore, addPerson, removePerson, getAlive } from '../../src/engine/population'
+import { createStore, addLivingPerson, addPerson, removePerson, getAlive } from '../../src/engine/population'
 import { PersonAttrs } from '../../src/engine/population'
+import { createLineageRegistry, getLivingCount } from '../../src/engine/lineage'
+
 
 describe('Population Store', () => {
   it('createStore allocates arrays with given capacity', () => {
@@ -29,6 +31,29 @@ describe('Population Store', () => {
     expect(store.size).toBe(1)
     expect(store.age[0]).toBe(25)
     expect(store.sex[0]).toBe(1)
+  })
+
+  it('addLivingPerson increments lineage counts for both parents', () => {
+    const store = createStore(10)
+    const lineages = createLineageRegistry()
+
+    const beforeP = getLivingCount(lineages, 1)
+    const beforeM = getLivingCount(lineages, 2)
+
+    const id = addLivingPerson(store, lineages, {
+      age: 25,
+      sex: 1,
+      cohesion: 200,
+      married: 0,
+      partnerId: -1,
+      paternalLineage: 1,
+      maternalLineage: 2,
+      firstNameId: 0,
+    })
+
+    expect(id).toBe(0)
+    expect(getLivingCount(lineages, 1)).toBe(beforeP + 1)
+    expect(getLivingCount(lineages, 2)).toBe(beforeM + 1)
   })
 
   it('addPerson increments size', () => {

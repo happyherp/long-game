@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { applyDepartures, departureProbability } from '../../src/engine/departures'
-import { createStore, addPerson, getAlive } from '../../src/engine/population'
-import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
+import { createStore, addLivingPerson, getAlive } from '../../src/engine/population'
+import { createLineageRegistry } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { Colony } from '../../src/engine/types'
 
@@ -27,7 +27,7 @@ describe('Departures', () => {
     const colony = createTestColony()
     const rng = createRNG(123)
 
-    addPerson(colony.population, {
+    addLivingPerson(colony.population, colony.lineages, {
       age: 12,
       sex: 0,
       cohesion: 50,
@@ -37,8 +37,6 @@ describe('Departures', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
     const initialSize = colony.population.size
     applyDepartures(colony, rng, 1960)
@@ -51,7 +49,7 @@ describe('Departures', () => {
     const rng = createRNG(999)
 
     for (let i = 0; i < 100; i++) {
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 20,
         sex: i % 2,
         cohesion: 50,
@@ -61,8 +59,6 @@ describe('Departures', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      incrementLivingCount(colony.lineages, 0)
-      incrementLivingCount(colony.lineages, 0)
     }
 
     const before = colony.population.size
@@ -114,7 +110,7 @@ describe('Departures', () => {
     const colony = createTestColony()
     const rng = createRNG(111)
 
-    const partnerId = addPerson(colony.population, {
+    const partnerId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 1,
       cohesion: 100,
@@ -124,10 +120,8 @@ describe('Departures', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const departerId = addPerson(colony.population, {
+    const departerId = addLivingPerson(colony.population, colony.lineages, {
       age: 20,
       sex: 0,
       cohesion: 30,
@@ -137,8 +131,6 @@ describe('Departures', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
     expect(colony.population.married[partnerId]).toBe(1)
 
@@ -155,7 +147,7 @@ describe('Departures', () => {
     const rng = createRNG(222)
 
     for (let i = 0; i < 50; i++) {
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 20,
         sex: 0,
         cohesion: 50,
@@ -165,8 +157,6 @@ describe('Departures', () => {
         maternalLineage: 10,
         firstNameId: 0,
       })
-      incrementLivingCount(colony.lineages, 5)
-      incrementLivingCount(colony.lineages, 10)
     }
 
     const countBefore5 = colony.lineages.livingCount[5]

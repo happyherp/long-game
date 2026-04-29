@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { applyBirths, birthProbability } from '../../src/engine/births'
-import { createStore, addPerson, getAlive } from '../../src/engine/population'
-import { createLineageRegistry, incrementLivingCount, getLivingCount } from '../../src/engine/lineage'
+import { createStore, addLivingPerson, getAlive } from '../../src/engine/population'
+import { createLineageRegistry, getLivingCount } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { Colony } from '../../src/engine/types'
 
@@ -27,7 +27,7 @@ describe('Births', () => {
     const colony = createTestColony()
     const rng = createRNG(123)
 
-    addPerson(colony.population, {
+    addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 240,
@@ -37,8 +37,6 @@ describe('Births', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
     const events = applyBirths(colony, rng, 1960)
     expect(events).toHaveLength(0)
@@ -49,7 +47,7 @@ describe('Births', () => {
     const colony = createTestColony()
     const rng = createRNG(456)
 
-    const youngGirlId = addPerson(colony.population, {
+    const youngGirlId = addLivingPerson(colony.population, colony.lineages, {
       age: 14,
       sex: 0,
       cohesion: 240,
@@ -59,10 +57,8 @@ describe('Births', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const malePaid = addPerson(colony.population, {
+    const malePaid = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 1,
       cohesion: 240,
@@ -72,8 +68,6 @@ describe('Births', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
     colony.population.married[youngGirlId] = 1
     colony.population.partnerId[youngGirlId] = malePaid
@@ -88,7 +82,7 @@ describe('Births', () => {
 
     let totalBirths = 0
     for (let i = 0; i < 10; i++) {
-      const motherId = addPerson(colony.population, {
+      const motherId = addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 0,
         cohesion: 240,
@@ -98,10 +92,8 @@ describe('Births', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      incrementLivingCount(colony.lineages, 0)
-      incrementLivingCount(colony.lineages, 0)
 
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 27,
         sex: 1,
         cohesion: 235,
@@ -111,8 +103,6 @@ describe('Births', () => {
         maternalLineage: 1,
         firstNameId: 0,
       })
-      incrementLivingCount(colony.lineages, 1)
-      incrementLivingCount(colony.lineages, 1)
     }
 
     const events = applyBirths(colony, rng, 1960)
@@ -126,7 +116,7 @@ describe('Births', () => {
     const colony = createTestColony()
     const rng = createRNG(111)
 
-    const motherId = addPerson(colony.population, {
+    const motherId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 240,
@@ -136,10 +126,8 @@ describe('Births', () => {
       maternalLineage: 10,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 5)
-    incrementLivingCount(colony.lineages, 10)
 
-    const fatherId = addPerson(colony.population, {
+    const fatherId = addLivingPerson(colony.population, colony.lineages, {
       age: 27,
       sex: 1,
       cohesion: 235,
@@ -149,8 +137,6 @@ describe('Births', () => {
       maternalLineage: 12,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 7)
-    incrementLivingCount(colony.lineages, 12)
 
     const events = applyBirths(colony, rng, 1960)
 
@@ -165,7 +151,7 @@ describe('Births', () => {
     const colony = createTestColony()
     const rng = createRNG(222)
 
-    const motherId = addPerson(colony.population, {
+    const motherId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 200,
@@ -175,10 +161,8 @@ describe('Births', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const fatherId = addPerson(colony.population, {
+    const fatherId = addLivingPerson(colony.population, colony.lineages, {
       age: 27,
       sex: 1,
       cohesion: 240,
@@ -188,8 +172,6 @@ describe('Births', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
     const events = applyBirths(colony, rng, 1960)
 
@@ -207,7 +189,7 @@ describe('Births', () => {
     const colony = createTestColony()
     const rng = createRNG(333)
 
-    const motherId = addPerson(colony.population, {
+    const motherId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 240,
@@ -217,10 +199,8 @@ describe('Births', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const fatherId = addPerson(colony.population, {
+    const fatherId = addLivingPerson(colony.population, colony.lineages, {
       age: 27,
       sex: 1,
       cohesion: 235,
@@ -230,8 +210,6 @@ describe('Births', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
     const countBefore0 = getLivingCount(colony.lineages, 0)
     const countBefore1 = getLivingCount(colony.lineages, 1)
@@ -274,7 +252,7 @@ describe('Births', () => {
     const womenIds: number[] = []
 
     for (let i = 0; i < numWomen; i++) {
-      const womenId = addPerson(colony.population, {
+      const womenId = addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 0,
         cohesion: 235,
@@ -285,10 +263,8 @@ describe('Births', () => {
         firstNameId: 0,
       })
       womenIds.push(womenId)
-      incrementLivingCount(colony.lineages, 0)
-      incrementLivingCount(colony.lineages, 0)
 
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 27,
         sex: 1,
         cohesion: 230,
@@ -298,8 +274,6 @@ describe('Births', () => {
         maternalLineage: 1,
         firstNameId: 0,
       })
-      incrementLivingCount(colony.lineages, 1)
-      incrementLivingCount(colony.lineages, 1)
     }
 
     let totalBirths = 0

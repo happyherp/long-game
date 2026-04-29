@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { applyCohesionDrift } from '../../src/engine/cohesion'
-import { createStore, addPerson } from '../../src/engine/population'
-import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
+import { createStore, addLivingPerson } from '../../src/engine/population'
+import { createLineageRegistry } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { Colony } from '../../src/engine/types'
 
@@ -28,7 +28,7 @@ describe('Cohesion Drift', () => {
     colony.doctrine.smartphones = true
     const rng = createRNG(123)
 
-    const id = addPerson(colony.population, {
+    const id = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 150,
@@ -38,8 +38,6 @@ describe('Cohesion Drift', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
     const before = colony.population.cohesion[id]
     applyCohesionDrift(colony, rng)
@@ -53,7 +51,7 @@ describe('Cohesion Drift', () => {
     colony.doctrine.plainDress = true
     const rng = createRNG(456)
 
-    const id = addPerson(colony.population, {
+    const id = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 150,
@@ -63,8 +61,6 @@ describe('Cohesion Drift', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
     const before = colony.population.cohesion[id]
     applyCohesionDrift(colony, rng)
@@ -77,7 +73,7 @@ describe('Cohesion Drift', () => {
     const colony = createTestColony()
     const rng = createRNG(789)
 
-    const lowCohesionId = addPerson(colony.population, {
+    const lowCohesionId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 100,
@@ -87,10 +83,8 @@ describe('Cohesion Drift', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const highCohesionId = addPerson(colony.population, {
+    const highCohesionId = addLivingPerson(colony.population, colony.lineages, {
       age: 27,
       sex: 1,
       cohesion: 240,
@@ -100,8 +94,6 @@ describe('Cohesion Drift', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
     const before = colony.population.cohesion[lowCohesionId]
     applyCohesionDrift(colony, rng)
@@ -114,7 +106,7 @@ describe('Cohesion Drift', () => {
     const colony = createTestColony()
     const rng = createRNG(111)
 
-    const highCohesionId = addPerson(colony.population, {
+    const highCohesionId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 240,
@@ -124,10 +116,8 @@ describe('Cohesion Drift', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const lowCohesionId = addPerson(colony.population, {
+    const lowCohesionId = addLivingPerson(colony.population, colony.lineages, {
       age: 27,
       sex: 1,
       cohesion: 100,
@@ -137,8 +127,6 @@ describe('Cohesion Drift', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
     const before = colony.population.cohesion[highCohesionId]
     applyCohesionDrift(colony, rng)
@@ -153,7 +141,7 @@ describe('Cohesion Drift', () => {
     colony.doctrine.englishSchool = true
     const rng = createRNG(222)
 
-    const id = addPerson(colony.population, {
+    const id = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 5,
@@ -163,8 +151,6 @@ describe('Cohesion Drift', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
     for (let i = 0; i < 10; i++) {
       applyCohesionDrift(colony, rng.fork(`clamp-test-${i}`))
@@ -178,7 +164,7 @@ describe('Cohesion Drift', () => {
     const colony = createTestColony()
     const rng = createRNG(333)
 
-    const id = addPerson(colony.population, {
+    const id = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 150,
@@ -188,8 +174,6 @@ describe('Cohesion Drift', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
     const before = colony.population.cohesion[id]
     applyCohesionDrift(colony, rng)
