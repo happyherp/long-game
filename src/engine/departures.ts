@@ -42,14 +42,14 @@ export function applyDepartures(colony: Colony, rng: RNG, year: number): GameEve
     if (age < 13) continue
 
     const partnerId = population.partnerId[id]
-    const partner = partnerId !== -1 && partnerId >= 0 ? population : null
+    const hasPartner = partnerId >= 0
 
     const person = {
       age,
       cohesion: population.cohesion[id],
     }
 
-    const partnerObj = partner
+    const partnerObj = hasPartner
       ? {
           age: population.age[partnerId],
           cohesion: population.cohesion[partnerId],
