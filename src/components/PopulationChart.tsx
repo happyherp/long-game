@@ -43,7 +43,16 @@ export function PopulationChart() {
     const line = d3.line<YearSnapshot>().x((d) => xScale(d.year)).y((d) => yScale(d.population))
 
     svg.select<SVGPathElement>('.pop-line').datum(history).attr('d', line)
-    svg.select<SVGGElement>('.x-axis').call(d3.axisBottom(xScale))
+    
+    // Only show integer year ticks without decimal places
+    const xDomain = xScale.domain()
+    const tickValues = d3.range(Math.ceil(xDomain[0]), Math.floor(xDomain[1]) + 1)
+    svg.select<SVGGElement>('.x-axis').call(
+      d3.axisBottom(xScale)
+        .tickValues(tickValues)
+        .tickFormat(d3.format('d')) // Format as integers without .0
+    )
+    
     svg.select<SVGGElement>('.y-axis').call(d3.axisLeft(yScale))
   }, [colony])
 
