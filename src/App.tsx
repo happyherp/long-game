@@ -5,6 +5,7 @@ import { ColonySummary } from './components/ColonySummary'
 import { DoctrineSheet } from './components/DoctrineSheet'
 import { PopulationChart } from './components/PopulationChart'
 import { GameOverScreen } from './components/GameOverScreen'
+import { PeopleList } from './components/PeopleList'
 import { loadGame, saveGame, deleteGame } from './persistence/db'
 
 export default function App() {
@@ -56,7 +57,9 @@ export default function App() {
 
       <PopulationChart />
 
-      <div className="bg-white shadow p-4 rounded">
+      <PeopleList />
+
+      <div className="bg-white shadow p-4 rounded mt-4">
         <button
           onClick={async () => {
             await deleteGame()
