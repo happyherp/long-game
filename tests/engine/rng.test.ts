@@ -87,6 +87,31 @@ describe('RNG', () => {
     }
   })
 
+  it('fork does not advance parent state', () => {
+    const rng1 = createRNG(999)
+    const rng2 = createRNG(999)
+
+    // Calling fork on rng1 must not shift its internal state relative to rng2.
+    rng1.fork('detour-a')
+    rng1.fork('detour-b')
+
+    for (let i = 0; i < 20; i++) {
+      expect(rng1.next()).toBe(rng2.next())
+    }
+  })
+
+  it('same parent seed + same label always yields the same child stream', () => {
+    // This property is what makes deterministic replay possible: a replay
+    // tool can re-derive any per-tick RNG by forking a fresh root RNG with
+    // the same seed and label without replaying all prior ticks.
+    const child1 = createRNG(42).fork('tick-7')
+    const child2 = createRNG(42).fork('tick-7')
+
+    for (let i = 0; i < 50; i++) {
+      expect(child1.next()).toBe(child2.next())
+    }
+  })
+
   it('distributes nextInt() evenly across range', () => {
     const rng = createRNG(555)
     const max = 5
