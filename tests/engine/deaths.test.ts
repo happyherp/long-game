@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { applyDeaths } from '../../src/engine/deaths'
-import { createStore, addLivingPerson, getAlive } from '../../src/engine/population'
+import { createStore, addLivingPerson, getAlive, getSlot } from '../../src/engine/population'
 import { createLineageRegistry } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 
@@ -19,6 +19,10 @@ describe('Deaths', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }
@@ -36,7 +40,7 @@ describe('Deaths', () => {
     const lineages = createLineageRegistry()
     const rng = createRNG(456)
 
-    const id1 = addLivingPerson(store, lineages, {
+    addLivingPerson(store, lineages, {
       age: 90,
       sex: 0,
       cohesion: 200,
@@ -44,6 +48,10 @@ describe('Deaths', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -67,6 +75,10 @@ describe('Deaths', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -78,18 +90,22 @@ describe('Deaths', () => {
       partnerId: id1,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
-    store.partnerId[id1] = id2
+    store.partnerId[getSlot(store, id1)] = id2
 
-    expect(store.married[id2]).toBe(1)
-    expect(store.partnerId[id2]).toBe(id1)
+    expect(store.married[getSlot(store, id2)]).toBe(1)
+    expect(store.partnerId[getSlot(store, id2)]).toBe(id1)
 
     applyDeaths(store, lineages, rng, 1960)
 
-    expect(store.married[id2]).toBe(0)
-    expect(store.partnerId[id2]).toBe(-1)
+    expect(store.married[getSlot(store, id2)]).toBe(0)
+    expect(store.partnerId[getSlot(store, id2)]).toBe(-1)
   })
 
   it('decrements lineage living counts', () => {
@@ -105,6 +121,10 @@ describe('Deaths', () => {
       partnerId: -1,
       paternalLineage: 5,
       maternalLineage: 10,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -141,6 +161,10 @@ describe('Deaths', () => {
           partnerId: -1,
           paternalLineage: 0,
           maternalLineage: 0,
+          fatherId: -1,
+          motherId: -1,
+          origin: 0,
+          arrivalYear: 1960,
           firstNameId: 0,
         })
       }
@@ -168,6 +192,10 @@ describe('Deaths', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }
@@ -192,6 +220,10 @@ describe('Deaths', () => {
         partnerId: -1,
         paternalLineage: i % 30,
         maternalLineage: (i + 1) % 30,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }

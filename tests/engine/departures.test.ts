@@ -35,6 +35,10 @@ describe('Departures', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -57,6 +61,10 @@ describe('Departures', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }
@@ -118,6 +126,10 @@ describe('Departures', () => {
       partnerId: 1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -129,6 +141,10 @@ describe('Departures', () => {
       partnerId: partnerId,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -155,6 +171,10 @@ describe('Departures', () => {
         partnerId: -1,
         paternalLineage: 5,
         maternalLineage: 10,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }

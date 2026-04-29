@@ -3,10 +3,19 @@ export interface PopulationStore {
   sex: Uint8Array
   cohesion: Uint8Array
   married: Uint8Array
-  partnerId: Int32Array
+  partnerId: Int32Array      // stores stable ID; -1 if single
   paternalLineage: Uint16Array
   maternalLineage: Uint16Array
+  fatherId: Int32Array       // stable ID; -1 if founder/unknown
+  motherId: Int32Array       // stable ID; -1 if founder/unknown
+  origin: Uint8Array         // 0 = born-in, 1 = inflow
+  arrivalYear: Int16Array    // birth year for born-in, arrival year for inflow
   firstNameId: Uint8Array
+
+  // stable-ID infrastructure
+  idToSlot: Map<number, number>  // stable id -> current slot
+  slotToId: Int32Array           // slot -> stable id
+  nextId: number                 // monotonically increasing
 
   capacity: number
   size: number

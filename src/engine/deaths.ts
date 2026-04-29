@@ -1,6 +1,6 @@
 import { PopulationStore, GameEvent } from './types'
 import { RNG } from './rng'
-import { removePerson, getAlive } from './population'
+import { removePerson, getAlive, getSlot } from './population'
 import { decrementLivingCount } from './lineage'
 import { LineageRegistry } from './types'
 
@@ -37,38 +37,39 @@ export function applyDeaths(
   year: number,
 ): GameEvent[] {
   const events: GameEvent[] = []
-  const toRemove: number[] = []
+  const toRemove: number[] = []  // stable IDs
 
-  for (const id of getAlive(population)) {
-    const age = population.age[id]
+  for (const slot of getAlive(population)) {
+    const age = population.age[slot]
     const prob = getDeathProbability(age)
 
     if (rng.next() < prob) {
-      toRemove.push(id)
-      events.push({
-        type: 'death',
-        personId: id,
-        year,
-      })
+      const stableId = population.slotToId[slot]
+      toRemove.push(stableId)
+      events.push({ type: 'death', personId: stableId, year })
     }
   }
 
-  toRemove.reverse()
+  for (const stableId of toRemove) {
+    const slot = getSlot(population, stableId)
+    if (slot === -1) continue  // already removed (e.g. partner died first)
 
-  for (const id of toRemove) {
-    const paternalLineage = population.paternalLineage[id]
-    const maternalLineage = population.maternalLineage[id]
-    const partnerId = population.partnerId[id]
+    const paternalLineage = population.paternalLineage[slot]
+    const maternalLineage = population.maternalLineage[slot]
+    const partnerStableId = population.partnerId[slot]
 
     decrementLivingCount(lineages, paternalLineage)
     decrementLivingCount(lineages, maternalLineage)
 
-    if (partnerId !== -1 && partnerId >= 0) {
-      population.married[partnerId] = 0
-      population.partnerId[partnerId] = -1
+    if (partnerStableId >= 0) {
+      const partnerSlot = getSlot(population, partnerStableId)
+      if (partnerSlot >= 0) {
+        population.married[partnerSlot] = 0
+        population.partnerId[partnerSlot] = -1
+      }
     }
 
-    removePerson(population, id)
+    removePerson(population, stableId)
   }
 
   return events
