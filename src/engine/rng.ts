@@ -23,6 +23,12 @@ export function createRNG(seed: number): RNG {
       return Math.floor(mulberry32() * maxExclusive)
     },
 
+    // fork() derives a child RNG from the current state XOR'd with a label
+    // hash. The parent state is intentionally NOT advanced: the same parent
+    // can produce multiple independent child streams with different labels,
+    // and replay tools can re-derive any child by re-forking with the same
+    // seed + label, without needing to track how many times the parent was
+    // previously called.
     fork(label: string): RNG {
       const newSeed = (state >>> 0) ^ hashString(label)
       return createRNG(newSeed)
