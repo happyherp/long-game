@@ -22,7 +22,7 @@ describe('Founding Colony', () => {
     const rng = createRNG(12345)
     const colony = generateFoundingColony(rng, 'Cayo')
 
-    expect(colony.treasury).toBe(50000)
+    expect(colony.treasury).toBe(150000)
   })
 
   it('has approximately 50/50 sex ratio', () => {

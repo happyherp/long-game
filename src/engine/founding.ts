@@ -6,7 +6,7 @@ import { FOUNDER_SURNAMES } from './names'
 
 const FOUNDING_POPULATION = 280
 const FOUNDING_YEAR = 1960
-const FOUNDING_TREASURY = 50000
+const FOUNDING_TREASURY = 150000
 
 interface AgeGroup {
   minAge: number

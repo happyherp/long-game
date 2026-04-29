@@ -3,6 +3,7 @@ import { useGameStore } from './store/gameStore'
 import { Header } from './components/Header'
 import { ColonySummary } from './components/ColonySummary'
 import { DoctrineSheet } from './components/DoctrineSheet'
+import { BalanceSheet } from './components/BalanceSheet'
 import { PopulationChart } from './components/PopulationChart'
 import { GameOverScreen } from './components/GameOverScreen'
 import { loadGame, saveGame, deleteGame } from './persistence/db'
@@ -52,6 +53,8 @@ export default function App() {
         <ColonySummary />
         <DoctrineSheet />
       </div>
+
+      <BalanceSheet />
 
       <PopulationChart />
 

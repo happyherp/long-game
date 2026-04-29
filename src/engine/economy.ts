@@ -28,9 +28,9 @@ export function updateTreasury(colony: Colony): void {
     output *= 6 / 7
   }
 
-  const expenses = colony.population.size * 600
+  const expenses = colony.population.size * 200
   const strictness = countStrictness(colony.doctrine)
-  const enforcement = colony.population.size * colony.population.size * strictness * 0.0003
+  const enforcement = colony.population.size * colony.population.size * strictness * 0.0001
 
   colony.treasury += Math.floor(output - expenses - enforcement)
 }

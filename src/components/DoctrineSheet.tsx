@@ -16,6 +16,10 @@ export function DoctrineSheet() {
     setDoctrineForColony(selectedColonyId, changes)
   }
 
+  const handleMarriageDoctrineChange = (value: 'courtship' | 'lateMarriage' | 'modern') => {
+    handleDoctrineChange({ marriageDoctrine: value })
+  }
+
   return (
     <div className="bg-white shadow p-4 rounded mb-4">
       <h2 className="text-xl font-bold mb-4">The Fence Around the Community</h2>
@@ -24,23 +28,26 @@ export function DoctrineSheet() {
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">Marriage</h3>
         <div className="space-y-3">
-          <DoctrineToggle
+          <MarriageDoctrineRadio
             label="Courtship"
             description="Traditional pairing with community oversight."
-            value={doctrine.marriageDoctrine === 'courtship'}
-            onChange={(val) => handleDoctrineChange({ marriageDoctrine: val ? 'courtship' : 'lateMarriage' })}
+            value="courtship"
+            currentValue={doctrine.marriageDoctrine}
+            onChange={handleMarriageDoctrineChange}
           />
-          <DoctrineToggle
+          <MarriageDoctrineRadio
             label="Late Marriage"
             description="Marriage delayed to 22+ for better stewardship."
-            value={doctrine.marriageDoctrine === 'lateMarriage'}
-            onChange={(val) => handleDoctrineChange({ marriageDoctrine: val ? 'lateMarriage' : 'courtship' })}
+            value="lateMarriage"
+            currentValue={doctrine.marriageDoctrine}
+            onChange={handleMarriageDoctrineChange}
           />
-          <DoctrineToggle
+          <MarriageDoctrineRadio
             label="Modern Dating"
             description="Individual choice in marriage partners."
-            value={doctrine.marriageDoctrine === 'modern'}
-            onChange={(val) => handleDoctrineChange({ marriageDoctrine: val ? 'modern' : 'courtship' })}
+            value="modern"
+            currentValue={doctrine.marriageDoctrine}
+            onChange={handleMarriageDoctrineChange}
           />
           <div className="flex items-center justify-between pb-3 border-b">
             <div>
@@ -300,6 +307,34 @@ function DoctrineToggle({ label, description, value, onChange }: {
         }`}
       >
         {value ? 'Yes' : 'No'}
+      </button>
+    </div>
+  )
+}
+
+function MarriageDoctrineRadio({ label, description, value, currentValue, onChange }: {
+  label: string
+  description: string
+  value: 'courtship' | 'lateMarriage' | 'modern'
+  currentValue: string
+  onChange: (value: 'courtship' | 'lateMarriage' | 'modern') => void
+}) {
+  const isSelected = currentValue === value
+  return (
+    <div className="flex items-center justify-between pb-3 border-b">
+      <div>
+        <p className="font-bold">{label}</p>
+        <p className="text-sm text-gray-600">{description}</p>
+      </div>
+      <button
+        onClick={() => onChange(value)}
+        className={`px-3 py-1 rounded font-bold ${
+          isSelected
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-300 text-gray-700 hover:bg-gray-400'
+        }`}
+      >
+        {isSelected ? '✓ Selected' : 'Select'}
       </button>
     </div>
   )
