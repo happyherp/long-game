@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        if: hashFiles('package.json') != ''
+        run: npm ci
+      - name: Lint
+        if: hashFiles('package.json') != ''
+        run: npm run lint
+      - name: No package.json yet
+        if: hashFiles('package.json') == ''
+        run: echo "Skipping — package.json not present yet."
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        if: hashFiles('package.json') != ''
+        run: npm ci
+      - name: Typecheck
+        if: hashFiles('package.json') != ''
+        run: npm run typecheck
+      - name: No package.json yet
+        if: hashFiles('package.json') == ''
+        run: echo "Skipping — package.json not present yet."
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        if: hashFiles('package.json') != ''
+        run: npm ci
+      - name: Test
+        if: hashFiles('package.json') != ''
+        run: npm run test -- --run
+      - name: No package.json yet
+        if: hashFiles('package.json') == ''
+        run: echo "Skipping — package.json not present yet."
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install
+        if: hashFiles('package.json') != ''
+        run: npm ci
+      - name: Build
+        if: hashFiles('package.json') != ''
+        run: npm run build
+      - name: No package.json yet
+        if: hashFiles('package.json') == ''
+        run: echo "Skipping — package.json not present yet."
