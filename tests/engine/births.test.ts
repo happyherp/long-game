@@ -247,19 +247,19 @@ describe('Births', () => {
   })
 
   it('birthProbability increases with cohesion', () => {
-    const low = birthProbability(100, 25, {})
-    const medium = birthProbability(170, 25, {})
-    const high = birthProbability(240, 25, {})
+    const low = birthProbability(100, 25)
+    const medium = birthProbability(170, 25)
+    const high = birthProbability(240, 25)
 
     expect(low).toBeLessThan(medium)
     expect(medium).toBeLessThan(high)
   })
 
   it('birthProbability peaks around age 25', () => {
-    const age20 = birthProbability(220, 20, {})
-    const age25 = birthProbability(220, 25, {})
-    const age30 = birthProbability(220, 30, {})
-    const age40 = birthProbability(220, 40, {})
+    const age20 = birthProbability(220, 20)
+    const age25 = birthProbability(220, 25)
+    const age30 = birthProbability(220, 30)
+    const age40 = birthProbability(220, 40)
 
     expect(age25).toBeGreaterThan(age20)
     expect(age25).toBeGreaterThan(age30)

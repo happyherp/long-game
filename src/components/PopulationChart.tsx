@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 import { useGameStore } from '../store/gameStore'
+import { YearSnapshot } from '../engine/types'
 
 export function PopulationChart() {
   const { colony } = useGameStore()
@@ -33,7 +34,7 @@ export function PopulationChart() {
       .range([height, 0])
 
     const line = d3
-      .line<any>()
+      .line<YearSnapshot>()
       .x((d) => xScale(d.year))
       .y((d) => yScale(d.population))
 

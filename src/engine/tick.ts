@@ -1,4 +1,4 @@
-import { Colony, TickResult } from './types'
+import { Colony, PopulationStore, TickResult } from './types'
 import { RNG } from './rng'
 import { getAlive } from './population'
 import { applyDeaths } from './deaths'
@@ -41,7 +41,7 @@ export function tick(colony: Colony, rng: RNG): TickResult {
   }
 }
 
-function ageEveryone(population: any): void {
+function ageEveryone(population: PopulationStore): void {
   for (const id of getAlive(population)) {
     if (population.age[id] < 255) {
       population.age[id]++

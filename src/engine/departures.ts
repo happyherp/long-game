@@ -1,7 +1,12 @@
-import { Colony, GameEvent } from './types'
+import { Colony, Doctrine, GameEvent } from './types'
 import { getAlive, removePerson } from './population'
 import { decrementLivingCount } from './lineage'
 import { RNG } from './rng'
+
+interface PersonSnapshot {
+  age: number
+  cohesion: number
+}
 
 function ageDepartureCurve(age: number): number {
   if (age < 13) return 0
@@ -12,7 +17,7 @@ function ageDepartureCurve(age: number): number {
   return 0.1
 }
 
-export function departureProbability(person: any, partner: any, doctrine: any): number {
+export function departureProbability(person: PersonSnapshot, partner: PersonSnapshot | null, doctrine: Doctrine): number {
   const cohesionFactor = 1 - person.cohesion / 255
   const ageFactor = ageDepartureCurve(person.age)
 
@@ -46,6 +51,7 @@ export function applyDepartures(colony: Colony, rng: RNG, year: number): GameEve
 
     const partnerObj = partner
       ? {
+          age: population.age[partnerId],
           cohesion: population.cohesion[partnerId],
         }
       : null

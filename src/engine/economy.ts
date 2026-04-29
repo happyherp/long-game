@@ -1,4 +1,4 @@
-import { Colony } from './types'
+import { Colony, Doctrine } from './types'
 import { getAlive } from './population'
 
 export function updateTreasury(colony: Colony): void {
@@ -19,7 +19,7 @@ export function updateTreasury(colony: Colony): void {
   colony.treasury += output - expenses - enforcement
 }
 
-function countStrictness(doctrine: any): number {
+function countStrictness(doctrine: Doctrine): number {
   let s = 0
   if (!doctrine.smartphones) s++
   if (!doctrine.englishSchool) s++

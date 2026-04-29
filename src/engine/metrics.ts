@@ -1,4 +1,4 @@
-import { Colony, ColonyMetrics, YearSnapshot } from './types'
+import { Colony, ColonyMetrics, PopulationStore, YearSnapshot } from './types'
 import { getAlive } from './population'
 
 export function computeMetrics(colony: Colony): ColonyMetrics {
@@ -8,13 +8,11 @@ export function computeMetrics(colony: Colony): ColonyMetrics {
   let females = 0
   let males = 0
   let cohesionSum = 0
-  let ageSum = 0
 
   for (const id of getAlive(pop)) {
     if (pop.sex[id] === 0) females++
     else males++
     cohesionSum += pop.cohesion[id]
-    ageSum += pop.age[id]
   }
 
   const cohesionAvg = total > 0 ? cohesionSum / total : 0
@@ -41,7 +39,7 @@ export function computeMetrics(colony: Colony): ColonyMetrics {
   }
 }
 
-export function computeMedianAge(pop: any): number {
+export function computeMedianAge(pop: PopulationStore): number {
   const ages: number[] = []
   for (const id of getAlive(pop)) {
     ages.push(pop.age[id])

@@ -1,7 +1,6 @@
 import { Colony, GameEvent } from './types'
 import { getAlive, addPerson } from './population'
 import { incrementLivingCount } from './lineage'
-import { getFirstName } from './names'
 import { RNG } from './rng'
 
 function ageCurve(age: number): number {
@@ -16,7 +15,6 @@ function ageCurve(age: number): number {
 export function birthProbability(
   motherCohesion: number,
   age: number,
-  _doctrine: any,
 ): number {
   const cohesionFactor = motherCohesion / 255
   const ageFactorVal = ageCurve(age)
@@ -26,7 +24,7 @@ export function birthProbability(
 }
 
 export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[] {
-  const { population, doctrine } = colony
+  const { population } = colony
   const events: GameEvent[] = []
 
   for (const motherId of getAlive(population)) {
@@ -44,7 +42,7 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
       continue
     }
 
-    const prob = birthProbability(cohesion, age, doctrine)
+    const prob = birthProbability(cohesion, age)
 
     if (rng.next() < prob) {
       const childSex = rng.nextInt(2)

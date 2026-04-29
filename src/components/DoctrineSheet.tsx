@@ -37,7 +37,7 @@ export function DoctrineSheet() {
           <div>
             <p className="font-bold">English Schooling</p>
             <p className="text-sm text-gray-600">
-              We protect the children's identity from the outside language.
+              We protect the children&apos;s identity from the outside language.
             </p>
           </div>
           <button

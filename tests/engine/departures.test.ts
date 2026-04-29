@@ -103,7 +103,7 @@ describe('Departures', () => {
 
     const suppressed = departureProbability(
       { age: 20, cohesion: 100 },
-      { cohesion: 240 },
+      { age: 22, cohesion: 240 },
       { smartphones: false, englishSchool: false, plainDress: true, marriageAge: 18 },
     )
 
