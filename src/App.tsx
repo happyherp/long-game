@@ -4,6 +4,7 @@ import { Header } from './components/Header'
 import { ColonySummary } from './components/ColonySummary'
 import { DoctrineSheet } from './components/DoctrineSheet'
 import { PopulationChart } from './components/PopulationChart'
+import { GameOverScreen } from './components/GameOverScreen'
 import { loadGame, saveGame, deleteGame } from './persistence/db'
 
 export default function App() {
@@ -60,6 +61,8 @@ export default function App() {
           New Game
         </button>
       </div>
+
+      <GameOverScreen />
     </div>
   )
 }
