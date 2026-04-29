@@ -75,20 +75,23 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   setDoctrineForColony: (colonyId: number, doctrine: Partial<Doctrine>) => {
-    const state = get()
-    if (!state.federation) return
-
-    const colony = state.federation.colonies.find(c => c.id === colonyId)
-    if (!colony) return
-
-    // Create new doctrine object and update via set() for proper reactivity
-    const newDoctrine = { ...colony.doctrine, ...doctrine }
     set((state) => {
-      const fed = state.federation
-      if (!fed) return state
-      const col = fed.colonies.find(c => c.id === colonyId)
-      if (!col) return state
-      return { federation: { ...fed, colonies: fed.colonies.map(c => c.id === colonyId ? { ...c, doctrine: newDoctrine } : c) } }
+      if (!state.federation) return state
+
+      const colony = state.federation.colonies.find(c => c.id === colonyId)
+      if (!colony) return state
+
+      // Create new doctrine object and update state for proper reactivity
+      const newDoctrine = { ...colony.doctrine, ...doctrine }
+
+      return {
+        federation: {
+          ...state.federation,
+          colonies: state.federation.colonies.map(c =>
+            c.id === colonyId ? { ...c, doctrine: newDoctrine } : c
+          ),
+        }
+      }
     })
   },
 
