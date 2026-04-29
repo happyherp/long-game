@@ -27,13 +27,58 @@ export interface LineageRegistry {
 }
 
 export interface Doctrine {
-  smartphones: boolean
-  englishSchool: boolean
+  // Marriage
+  marriageDoctrine: 'courtship' | 'lateMarriage' | 'modern'
+  marriageAge: number          // 17–22; meaningful for courtship & modern
+  marriageOutside: 'forbidden' | 'permitted'
+
+  // Religion / visible markers
+  baptismAge: 'infant' | 'sixteen' | 'believer'
+  shunning: boolean
+  worshipLanguage: 'plautdietsch' | 'highGerman' | 'english'
   plainDress: boolean
-  marriageAge: number
+  headCovering: boolean
+  beardForMarried: boolean
+  sundayObservance: boolean
+
+  // Education
+  englishSchool: boolean
+  higherEdMen: 'forbidden' | 'tradeOnly' | 'permitted' | 'encouraged'
+  higherEdWomen: 'forbidden' | 'tradeOnly' | 'permitted' | 'encouraged'
+
+  // Technology
+  smartphones: boolean
+  motorizedFarming: boolean
+  gridElectricity: boolean
+
+  // Outside contact
+  outsideTrade: 'open' | 'restricted' | 'closed'
+  inflowPolicy: 'open' | 'vetted' | 'closed'
+}
+
+export type LandType = 'jungleClearing' | 'farmland' | 'pasture'
+
+export interface LandParcel {
+  id: string
+  type: LandType
+  hectares: number
+  productivity: number    // 0..1, improves over time
+  purchaseYear: number
+}
+
+export type Building = 'clinic' | 'dairyPlant'
+
+export interface ColonyEconomy {
+  parcels: LandParcel[]
+  buildings: Building[]
+}
+
+export interface ColonyFlags {
+  recentRefusedSchism?: { year: number; multiplierUntil: number }
 }
 
 export interface Colony {
+  id: string
   name: string
   population: PopulationStore
   doctrine: Doctrine
@@ -41,6 +86,19 @@ export interface Colony {
   treasury: number
   year: number
   history: YearSnapshot[]
+  modernityPressure: number
+  economy: ColonyEconomy
+  // Inbreeding coefficient at pairing: maps stableId of one partner -> coefficient
+  pairingCoefficients: Map<number, number>
+  flags: ColonyFlags
+}
+
+export interface Federation {
+  year: number
+  colonies: Colony[]
+  modernWest: { willingness: number }
+  pendingSchisms: SchismEvent[]
+  history: FederationSnapshot[]
 }
 
 export interface YearSnapshot {
@@ -54,6 +112,13 @@ export interface YearSnapshot {
   departures: number
 }
 
+export interface FederationSnapshot {
+  year: number
+  totalPopulation: number
+  colonyCount: number
+  totalTreasury: number
+}
+
 export interface ColonyMetrics {
   totalPopulation: number
   femaleCount: number
@@ -63,12 +128,20 @@ export interface ColonyMetrics {
   cohesionAvg: number
   cohesionBand: 'low' | 'medium' | 'high'
   treasury: number
+  modernityPressure: number
   birthsThisYear: number
   deathsThisYear: number
   departuresThisYear: number
 }
 
-export type GameEventType = 'birth' | 'death' | 'departure' | 'pairing'
+export type GameEventType =
+  | 'birth'
+  | 'death'
+  | 'departure'
+  | 'pairing'
+  | 'separation'
+  | 'inflow'
+  | 'schism'
 
 export interface GameEvent {
   type: GameEventType
@@ -77,8 +150,39 @@ export interface GameEvent {
   payload?: unknown
 }
 
+export interface SchismEvent {
+  type: 'schism'
+  parentColonyId: string
+  direction: 'conservative' | 'liberal'
+  memberIds: number[]          // stable IDs
+  proposedDoctrine: Doctrine
+  proposedName: string
+}
+
 export interface TickResult {
-  colony: Colony
+  federation: Federation
   events: GameEvent[]
-  metrics: ColonyMetrics
+  metrics: ColonyMetrics[]
+}
+
+// Default conservative Cayo founding doctrine
+export const DEFAULT_DOCTRINE: Doctrine = {
+  marriageDoctrine: 'courtship',
+  marriageAge: 19,
+  marriageOutside: 'forbidden',
+  baptismAge: 'infant',
+  shunning: true,
+  worshipLanguage: 'plautdietsch',
+  plainDress: true,
+  headCovering: true,
+  beardForMarried: true,
+  sundayObservance: true,
+  englishSchool: false,
+  higherEdMen: 'forbidden',
+  higherEdWomen: 'forbidden',
+  smartphones: false,
+  motorizedFarming: false,
+  gridElectricity: false,
+  outsideTrade: 'restricted',
+  inflowPolicy: 'closed',
 }

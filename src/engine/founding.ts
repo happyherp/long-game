@@ -1,4 +1,4 @@
-import { Colony, PopulationStore } from './types'
+import { Colony, PopulationStore, DEFAULT_DOCTRINE } from './types'
 import { createStore, addLivingPerson, getSlot } from './population'
 import { createLineageRegistry } from './lineage'
 import { RNG } from './rng'
@@ -76,18 +76,29 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
   pairUnmarriedAdults(population, people, rngPairing)
 
   return {
+    id: 'cayo',
     name: colonyName,
     population,
-    doctrine: {
-      smartphones: false,
-      englishSchool: false,
-      plainDress: true,
-      marriageAge: 19,
-    },
+    doctrine: { ...DEFAULT_DOCTRINE },
     lineages,
     treasury: FOUNDING_TREASURY,
     year: FOUNDING_YEAR,
     history: [],
+    modernityPressure: 0,
+    economy: {
+      parcels: [
+        {
+          id: 'parcel-0',
+          type: 'jungleClearing',
+          hectares: 3000,
+          productivity: 0.4,
+          purchaseYear: FOUNDING_YEAR,
+        },
+      ],
+      buildings: [],
+    },
+    pairingCoefficients: new Map(),
+    flags: {},
   }
 }
 
