@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { generateFoundingColony } from '../../src/engine/founding'
 import { tick } from '../../src/engine/tick'
 import { createRNG } from '../../src/engine/rng'
-import { getAlive } from '../../src/engine/population'
 import { DEFAULT_DOCTRINE, Doctrine } from '../../src/engine/types'
 
 describe('Determinism', () => {

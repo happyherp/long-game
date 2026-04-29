@@ -96,7 +96,7 @@ describe('Cohesion Drift', () => {
       firstNameId: 0,
     })
 
-    const highCohesionId = addLivingPerson(colony.population, colony.lineages, {
+    addLivingPerson(colony.population, colony.lineages, {
       age: 27,
       sex: 1,
       cohesion: 240,
@@ -137,7 +137,7 @@ describe('Cohesion Drift', () => {
       firstNameId: 0,
     })
 
-    const lowCohesionId = addLivingPerson(colony.population, colony.lineages, {
+    addLivingPerson(colony.population, colony.lineages, {
       age: 27,
       sex: 1,
       cohesion: 100,
@@ -188,8 +188,18 @@ describe('Cohesion Drift', () => {
     expect(colony.population.cohesion[id]).toBeLessThanOrEqual(255)
   })
 
-  it('does not drift unmarried persons with partner', () => {
+  it('drifts unmarried persons based only on doctrine (no partner pull)', () => {
+    // Use a neutral doctrine (no positive or negative factors from doctrine)
+    // to confirm no partner pull is applied (max drift is just jitter ±1)
     const colony = createTestColony()
+    colony.doctrine.plainDress = false
+    colony.doctrine.headCovering = false
+    colony.doctrine.beardForMarried = false
+    colony.doctrine.sundayObservance = false
+    colony.doctrine.shunning = false
+    colony.doctrine.worshipLanguage = 'english'
+    colony.doctrine.smartphones = false
+    colony.doctrine.englishSchool = false
     const rng = createRNG(333)
 
     const id = addLivingPerson(colony.population, colony.lineages, {
@@ -211,6 +221,7 @@ describe('Cohesion Drift', () => {
     applyCohesionDrift(colony, 1960, rng)
     const after = colony.population.cohesion[id]
 
+    // Without partner pull and with neutral doctrine, drift is just random jitter ±1
     expect(after).toBeLessThanOrEqual(before + 2)
     expect(after).toBeGreaterThanOrEqual(before - 2)
   })

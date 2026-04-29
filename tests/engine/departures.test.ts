@@ -97,7 +97,6 @@ describe('Departures', () => {
 
   it('partner with high cohesion suppresses departure', () => {
     const baseDoc = { ...DEFAULT_DOCTRINE, smartphones: false, englishSchool: false }
-    const withSmartphones = { ...DEFAULT_DOCTRINE, smartphones: true }
 
     const baseProb = departureProbability(
       { age: 20, cohesion: 100 },
@@ -133,7 +132,7 @@ describe('Departures', () => {
       firstNameId: 0,
     })
 
-    const departerId = addLivingPerson(colony.population, colony.lineages, {
+    addLivingPerson(colony.population, colony.lineages, {
       age: 20,
       sex: 0,
       cohesion: 30,

@@ -33,7 +33,8 @@ export function departureProbability(person: PersonSnapshot, partner: PersonSnap
 }
 
 export function applyDepartures(colony: Colony, rng: RNG, year: number): GameEvent[] {
-  const { population, doctrine, lineages } = colony
+  const { population, doctrine, lineages, flags } = colony
+  const schismMultiplier = (flags.recentRefusedSchism && year <= flags.recentRefusedSchism.multiplierUntil) ? 1.5 : 1.0
   const events: GameEvent[] = []
   const toRemove: number[] = []  // stable IDs
 
@@ -57,7 +58,12 @@ export function applyDepartures(colony: Colony, rng: RNG, year: number): GameEve
       }
     }
 
-    const prob = departureProbability(person, partnerObj, doctrine)
+    let prob = departureProbability(person, partnerObj, doctrine)
+
+    // Apply schism refusal multiplier to young adults (16–35)
+    if (schismMultiplier > 1 && age >= 16 && age <= 35) {
+      prob *= schismMultiplier
+    }
 
     if (rng.next() < prob) {
       toRemove.push(population.slotToId[slot])
