@@ -7,7 +7,7 @@ import { makeColony } from './testUtils'
 vi.mock('../../src/store/gameStore')
 const mockStore = vi.mocked(useGameStore)
 
-beforeEach(() => vi.clearAllMocks())
+beforeEach(() => { vi.clearAllMocks() })
 
 describe('GameOverScreen', () => {
   it('renders nothing when there is no game over reason', () => {
