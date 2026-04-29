@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react'
 import { useGameStore } from '../store/gameStore'
 import { getFirstName } from '../engine/names'
+import { PersonDetail } from './PersonDetail'
 
 type SortKey = 'name' | 'age' | 'cohesion' | 'married'
 type SortDir = 'asc' | 'desc'
 
-interface PersonRow {
+export interface PersonRow {
   index: number
   firstName: string
   surname: string
@@ -14,6 +15,8 @@ interface PersonRow {
   cohesion: number
   married: boolean
 }
+
+const PAGE_SIZE = 50
 
 export function PeopleList() {
   const colony = useGameStore((s) => s.colony)
@@ -24,6 +27,8 @@ export function PeopleList() {
   const [maxAge, setMaxAge] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
+  const [limit, setLimit] = useState(PAGE_SIZE)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   const people = useMemo<PersonRow[]>(() => {
     if (!colony) return []
@@ -31,12 +36,10 @@ export function PeopleList() {
     const rows: PersonRow[] = []
     for (let i = 0; i < population.size; i++) {
       const sex = population.sex[i]
-      const firstNameId = population.firstNameId[i]
-      const paternalLineageId = population.paternalLineage[i]
-      const surname = lineages.surnames[paternalLineageId] ?? '?'
+      const surname = lineages.surnames[population.paternalLineage[i]] ?? '?'
       rows.push({
         index: i,
-        firstName: getFirstName(sex, firstNameId),
+        firstName: getFirstName(sex, population.firstNameId[i]),
         surname,
         sex,
         age: population.age[i],
@@ -63,17 +66,16 @@ export function PeopleList() {
   const sorted = useMemo(() => {
     const dir = sortDir === 'asc' ? 1 : -1
     return [...filtered].sort((a, b) => {
-      if (sortKey === 'name') {
-        const nameA = `${a.surname} ${a.firstName}`
-        const nameB = `${b.surname} ${b.firstName}`
-        return nameA.localeCompare(nameB) * dir
-      }
+      if (sortKey === 'name') return `${a.surname} ${a.firstName}`.localeCompare(`${b.surname} ${b.firstName}`) * dir
       if (sortKey === 'age') return (a.age - b.age) * dir
       if (sortKey === 'cohesion') return (a.cohesion - b.cohesion) * dir
       if (sortKey === 'married') return (Number(a.married) - Number(b.married)) * dir
       return 0
     })
   }, [filtered, sortKey, sortDir])
+
+  const visible = sorted.slice(0, limit)
+  const hasMore = sorted.length > limit
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
@@ -82,6 +84,15 @@ export function PeopleList() {
       setSortKey(key)
       setSortDir('asc')
     }
+    setLimit(PAGE_SIZE)
+  }
+
+  function resetFilters() {
+    setGenderFilter('all')
+    setMarriedFilter('all')
+    setMinAge('')
+    setMaxAge('')
+    setLimit(PAGE_SIZE)
   }
 
   function SortIcon({ col }: { col: SortKey }) {
@@ -91,23 +102,29 @@ export function PeopleList() {
 
   function cohesionLabel(c: number) {
     if (c >= 170) return 'high'
-    if (c >= 85) return 'medium'
+    if (c >= 85) return 'med'
     return 'low'
   }
+
+  function cohesionColor(c: number) {
+    if (c >= 170) return 'text-green-700'
+    if (c >= 85) return 'text-yellow-700'
+    return 'text-red-700'
+  }
+
+  const selectedPerson = selectedIndex !== null ? people.find((p) => p.index === selectedIndex) ?? null : null
 
   if (!colony) return null
 
   return (
-    <div className="bg-white shadow rounded p-4 mt-4">
-      <h2 className="text-lg font-semibold mb-3">People ({sorted.length} / {people.length})</h2>
-
+    <div>
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-4 text-sm">
+      <div className="flex flex-wrap gap-4 mb-4 text-sm items-center">
         <label className="flex items-center gap-1">
           Gender:
           <select
             value={genderFilter}
-            onChange={(e) => setGenderFilter(e.target.value as typeof genderFilter)}
+            onChange={(e) => { setGenderFilter(e.target.value as typeof genderFilter); setLimit(PAGE_SIZE) }}
             className="border rounded px-1 py-0.5"
           >
             <option value="all">All</option>
@@ -120,7 +137,7 @@ export function PeopleList() {
           Married:
           <select
             value={marriedFilter}
-            onChange={(e) => setMarriedFilter(e.target.value as typeof marriedFilter)}
+            onChange={(e) => { setMarriedFilter(e.target.value as typeof marriedFilter); setLimit(PAGE_SIZE) }}
             className="border rounded px-1 py-0.5"
           >
             <option value="all">All</option>
@@ -130,28 +147,33 @@ export function PeopleList() {
         </label>
 
         <label className="flex items-center gap-1">
-          Age min:
+          Age:
           <input
             type="number"
             value={minAge}
-            onChange={(e) => setMinAge(e.target.value)}
-            placeholder="0"
-            className="border rounded px-1 py-0.5 w-16"
+            onChange={(e) => { setMinAge(e.target.value); setLimit(PAGE_SIZE) }}
+            placeholder="min"
+            className="border rounded px-1 py-0.5 w-14"
+            min={0}
+          />
+          <span className="text-gray-400">–</span>
+          <input
+            type="number"
+            value={maxAge}
+            onChange={(e) => { setMaxAge(e.target.value); setLimit(PAGE_SIZE) }}
+            placeholder="max"
+            className="border rounded px-1 py-0.5 w-14"
             min={0}
           />
         </label>
 
-        <label className="flex items-center gap-1">
-          Age max:
-          <input
-            type="number"
-            value={maxAge}
-            onChange={(e) => setMaxAge(e.target.value)}
-            placeholder="—"
-            className="border rounded px-1 py-0.5 w-16"
-            min={0}
-          />
-        </label>
+        <button onClick={resetFilters} className="text-xs text-gray-400 hover:text-gray-600 underline">
+          Reset
+        </button>
+
+        <span className="ml-auto text-gray-500 text-xs">
+          {sorted.length} / {people.length} people
+        </span>
       </div>
 
       {/* Table */}
@@ -159,62 +181,42 @@ export function PeopleList() {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="border-b bg-gray-50 text-left">
-              <th
-                className="px-3 py-2 cursor-pointer select-none whitespace-nowrap"
-                onClick={() => toggleSort('name')}
-              >
+              <th className="px-3 py-2 cursor-pointer select-none whitespace-nowrap" onClick={() => toggleSort('name')}>
                 Name <SortIcon col="name" />
               </th>
-              <th className="px-3 py-2">Gender</th>
-              <th
-                className="px-3 py-2 cursor-pointer select-none"
-                onClick={() => toggleSort('age')}
-              >
+              <th className="px-3 py-2">Sex</th>
+              <th className="px-3 py-2 cursor-pointer select-none" onClick={() => toggleSort('age')}>
                 Age <SortIcon col="age" />
               </th>
-              <th
-                className="px-3 py-2 cursor-pointer select-none"
-                onClick={() => toggleSort('cohesion')}
-              >
+              <th className="px-3 py-2 cursor-pointer select-none" onClick={() => toggleSort('cohesion')}>
                 Cohesion <SortIcon col="cohesion" />
               </th>
-              <th
-                className="px-3 py-2 cursor-pointer select-none"
-                onClick={() => toggleSort('married')}
-              >
+              <th className="px-3 py-2 cursor-pointer select-none" onClick={() => toggleSort('married')}>
                 Married <SortIcon col="married" />
               </th>
             </tr>
           </thead>
           <tbody>
-            {sorted.length === 0 && (
+            {visible.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-3 py-6 text-center text-gray-400">
                   No people match the current filters.
                 </td>
               </tr>
             )}
-            {sorted.map((p) => (
-              <tr key={p.index} className="border-b hover:bg-gray-50">
-                <td className="px-3 py-1.5 font-medium">
+            {visible.map((p) => (
+              <tr
+                key={p.index}
+                className="border-b hover:bg-blue-50 cursor-pointer"
+                onClick={() => setSelectedIndex(p.index)}
+              >
+                <td className="px-3 py-1.5 font-medium text-blue-700 hover:underline">
                   {p.firstName} {p.surname}
                 </td>
-                <td className="px-3 py-1.5 text-gray-600">
-                  {p.sex === 1 ? 'M' : 'F'}
-                </td>
+                <td className="px-3 py-1.5 text-gray-600">{p.sex === 1 ? 'M' : 'F'}</td>
                 <td className="px-3 py-1.5">{p.age}</td>
-                <td className="px-3 py-1.5">
-                  <span
-                    className={
-                      p.cohesion >= 170
-                        ? 'text-green-700'
-                        : p.cohesion >= 85
-                        ? 'text-yellow-700'
-                        : 'text-red-700'
-                    }
-                  >
-                    {cohesionLabel(p.cohesion)} ({p.cohesion})
-                  </span>
+                <td className={`px-3 py-1.5 ${cohesionColor(p.cohesion)}`}>
+                  {cohesionLabel(p.cohesion)} ({p.cohesion})
                 </td>
                 <td className="px-3 py-1.5">{p.married ? 'Yes' : 'No'}</td>
               </tr>
@@ -222,6 +224,26 @@ export function PeopleList() {
           </tbody>
         </table>
       </div>
+
+      {hasMore && (
+        <div className="mt-2 text-center">
+          <button
+            onClick={() => setLimit((l) => l + PAGE_SIZE)}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Show more ({sorted.length - limit} remaining)
+          </button>
+        </div>
+      )}
+
+      {selectedPerson && (
+        <PersonDetail
+          person={selectedPerson}
+          colony={colony}
+          onClose={() => setSelectedIndex(null)}
+          onSelectPerson={(idx) => setSelectedIndex(idx)}
+        />
+      )}
     </div>
   )
 }
