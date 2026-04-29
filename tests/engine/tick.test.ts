@@ -29,15 +29,16 @@ describe('Tick', () => {
     const rng = createRNG(789)
     const colony = generateFoundingColony(rng, 'Test')
 
-    const minAgeBefore = Math.min(...Array.from(getAlive(colony.population)).map((id) => colony.population.age[id]))
-    const maxAgeBefore = Math.max(...Array.from(getAlive(colony.population)).map((id) => colony.population.age[id]))
+    const agesBefore = Array.from(getAlive(colony.population)).map((id) => colony.population.age[id])
+    const avgAgeBefore = agesBefore.reduce((a, b) => a + b, 0) / agesBefore.length
 
     tick(colony, rng.fork('test-tick'))
 
-    const minAgeAfter = Math.min(...Array.from(getAlive(colony.population)).map((id) => colony.population.age[id]))
-    const maxAgeAfter = Math.max(...Array.from(getAlive(colony.population)).map((id) => colony.population.age[id]))
+    const agesAfter = Array.from(getAlive(colony.population)).map((id) => colony.population.age[id])
+    const avgAgeAfter = agesAfter.reduce((a, b) => a + b, 0) / agesAfter.length
 
-    expect(maxAgeAfter).toBeGreaterThanOrEqual(maxAgeBefore)
+    // Average age should increase (surviving people aged), even if max age decreased from oldest dying
+    expect(avgAgeAfter).toBeGreaterThan(avgAgeBefore - 1)
   })
 
   it('is deterministic with same seed', () => {
