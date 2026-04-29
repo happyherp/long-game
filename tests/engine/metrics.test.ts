@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { computeMetrics, computeMedianAge, computeRollingTFR, toSnapshot } from '../../src/engine/metrics'
-import { createStore, addPerson } from '../../src/engine/population'
-import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
+import { createStore, addLivingPerson } from '../../src/engine/population'
+import { createLineageRegistry } from '../../src/engine/lineage'
 import { Colony } from '../../src/engine/types'
 
 describe('Metrics', () => {
@@ -26,7 +26,7 @@ describe('Metrics', () => {
     const colony = createTestColony()
 
     for (let i = 0; i < 50; i++) {
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: i % 2,
         cohesion: 150,
@@ -36,8 +36,6 @@ describe('Metrics', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      incrementLivingCount(colony.lineages, 0)
-      incrementLivingCount(colony.lineages, 0)
     }
 
     const metrics = computeMetrics(colony)
@@ -48,13 +46,9 @@ describe('Metrics', () => {
   it('computes median age correctly', () => {
     const colony = createTestColony()
 
-    addPerson(colony.population, { age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
-    addPerson(colony.population, { age: 30, sex: 1, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
-    addPerson(colony.population, { age: 40, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
-    for (const lineage of [0]) {
-      incrementLivingCount(colony.lineages, lineage)
-      incrementLivingCount(colony.lineages, lineage)
-    }
+    addLivingPerson(colony.population, colony.lineages, { age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
+    addLivingPerson(colony.population, colony.lineages, { age: 30, sex: 1, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
+    addLivingPerson(colony.population, colony.lineages, { age: 40, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
 
     const median = computeMedianAge(colony.population)
     expect(median).toBe(30)
@@ -66,7 +60,7 @@ describe('Metrics', () => {
     const highColony = createTestColony()
 
     for (let i = 0; i < 50; i++) {
-      addPerson(lowColony.population, {
+      addLivingPerson(lowColony.population, lowColony.lineages, {
         age: 25,
         sex: i % 2,
         cohesion: 80,
@@ -76,7 +70,7 @@ describe('Metrics', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      addPerson(mediumColony.population, {
+      addLivingPerson(mediumColony.population, mediumColony.lineages, {
         age: 25,
         sex: i % 2,
         cohesion: 150,
@@ -86,7 +80,7 @@ describe('Metrics', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      addPerson(highColony.population, {
+      addLivingPerson(highColony.population, highColony.lineages, {
         age: 25,
         sex: i % 2,
         cohesion: 240,
@@ -96,12 +90,6 @@ describe('Metrics', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      incrementLivingCount(lowColony.lineages, 0)
-      incrementLivingCount(lowColony.lineages, 0)
-      incrementLivingCount(mediumColony.lineages, 0)
-      incrementLivingCount(mediumColony.lineages, 0)
-      incrementLivingCount(highColony.lineages, 0)
-      incrementLivingCount(highColony.lineages, 0)
     }
 
     expect(computeMetrics(lowColony).cohesionBand).toBe('low')
@@ -122,7 +110,7 @@ describe('Metrics', () => {
 
   it('creates snapshot from metrics', () => {
     const colony = createTestColony()
-    addPerson(colony.population, {
+    addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 0,
       cohesion: 150,
@@ -132,8 +120,6 @@ describe('Metrics', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
     const metrics = computeMetrics(colony)
     const snapshot = toSnapshot(metrics, 1960, 10, 2, 1)

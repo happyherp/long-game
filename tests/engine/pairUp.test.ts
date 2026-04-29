@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { pairUp } from '../../src/engine/pairUp'
-import { createStore, addPerson, getAlive } from '../../src/engine/population'
-import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
+import { createStore, addLivingPerson, getAlive } from '../../src/engine/population'
+import { createLineageRegistry } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { Colony } from '../../src/engine/types'
 
@@ -27,7 +27,7 @@ describe('Pairing', () => {
     const colony = createTestColony()
     const rng = createRNG(123)
 
-    const maleId = addPerson(colony.population, {
+    const maleId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 1,
       cohesion: 220,
@@ -37,10 +37,8 @@ describe('Pairing', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const femaleId = addPerson(colony.population, {
+    const femaleId = addLivingPerson(colony.population, colony.lineages, {
       age: 22,
       sex: 0,
       cohesion: 210,
@@ -50,8 +48,6 @@ describe('Pairing', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
     const events = pairUp(colony, rng, 1960)
 
@@ -68,7 +64,7 @@ describe('Pairing', () => {
     colony.doctrine.marriageAge = 21
     const rng = createRNG(456)
 
-    const youngMaleId = addPerson(colony.population, {
+    const youngMaleId = addLivingPerson(colony.population, colony.lineages, {
       age: 18,
       sex: 1,
       cohesion: 220,
@@ -78,10 +74,8 @@ describe('Pairing', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const oldMaleId = addPerson(colony.population, {
+    const oldMaleId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 1,
       cohesion: 200,
@@ -91,10 +85,8 @@ describe('Pairing', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
-    const femaleId = addPerson(colony.population, {
+    const femaleId = addLivingPerson(colony.population, colony.lineages, {
       age: 22,
       sex: 0,
       cohesion: 210,
@@ -104,8 +96,6 @@ describe('Pairing', () => {
       maternalLineage: 2,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 2)
-    incrementLivingCount(colony.lineages, 2)
 
     const events = pairUp(colony, rng, 1960)
 
@@ -119,7 +109,7 @@ describe('Pairing', () => {
     const rng = createRNG(789)
 
     const maleIds = [
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 1,
         cohesion: 150,
@@ -129,7 +119,7 @@ describe('Pairing', () => {
         maternalLineage: 0,
         firstNameId: 0,
       }),
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 1,
         cohesion: 240,
@@ -139,7 +129,7 @@ describe('Pairing', () => {
         maternalLineage: 1,
         firstNameId: 0,
       }),
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 1,
         cohesion: 200,
@@ -152,7 +142,7 @@ describe('Pairing', () => {
     ]
 
     const femaleIds = [
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 22,
         sex: 0,
         cohesion: 230,
@@ -162,7 +152,7 @@ describe('Pairing', () => {
         maternalLineage: 3,
         firstNameId: 0,
       }),
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 22,
         sex: 0,
         cohesion: 210,
@@ -172,7 +162,7 @@ describe('Pairing', () => {
         maternalLineage: 4,
         firstNameId: 0,
       }),
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 22,
         sex: 0,
         cohesion: 170,
@@ -183,15 +173,6 @@ describe('Pairing', () => {
         firstNameId: 0,
       }),
     ]
-
-    maleIds.forEach((id) => {
-      incrementLivingCount(colony.lineages, colony.population.paternalLineage[id])
-      incrementLivingCount(colony.lineages, colony.population.maternalLineage[id])
-    })
-    femaleIds.forEach((id) => {
-      incrementLivingCount(colony.lineages, colony.population.paternalLineage[id])
-      incrementLivingCount(colony.lineages, colony.population.maternalLineage[id])
-    })
 
     const events = pairUp(colony, rng, 1960)
 
@@ -213,7 +194,7 @@ describe('Pairing', () => {
     const rng = createRNG(111)
 
     const maleIds = [
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 1,
         cohesion: 220,
@@ -223,7 +204,7 @@ describe('Pairing', () => {
         maternalLineage: 0,
         firstNameId: 0,
       }),
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 1,
         cohesion: 210,
@@ -233,7 +214,7 @@ describe('Pairing', () => {
         maternalLineage: 1,
         firstNameId: 0,
       }),
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 1,
         cohesion: 200,
@@ -246,7 +227,7 @@ describe('Pairing', () => {
     ]
 
     const femaleIds = [
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 22,
         sex: 0,
         cohesion: 230,
@@ -256,7 +237,7 @@ describe('Pairing', () => {
         maternalLineage: 3,
         firstNameId: 0,
       }),
-      addPerson(colony.population, {
+      addLivingPerson(colony.population, colony.lineages, {
         age: 22,
         sex: 0,
         cohesion: 210,
@@ -267,15 +248,6 @@ describe('Pairing', () => {
         firstNameId: 0,
       }),
     ]
-
-    maleIds.forEach((id) => {
-      incrementLivingCount(colony.lineages, colony.population.paternalLineage[id])
-      incrementLivingCount(colony.lineages, colony.population.maternalLineage[id])
-    })
-    femaleIds.forEach((id) => {
-      incrementLivingCount(colony.lineages, colony.population.paternalLineage[id])
-      incrementLivingCount(colony.lineages, colony.population.maternalLineage[id])
-    })
 
     const events = pairUp(colony, rng, 1960)
 
@@ -296,7 +268,7 @@ describe('Pairing', () => {
     const colony = createTestColony()
     const rng = createRNG(222)
 
-    const marriedMaleId = addPerson(colony.population, {
+    const marriedMaleId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 1,
       cohesion: 240,
@@ -306,10 +278,8 @@ describe('Pairing', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 0)
-    incrementLivingCount(colony.lineages, 0)
 
-    const singleMaleId = addPerson(colony.population, {
+    const singleMaleId = addLivingPerson(colony.population, colony.lineages, {
       age: 25,
       sex: 1,
       cohesion: 200,
@@ -319,10 +289,8 @@ describe('Pairing', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 1)
-    incrementLivingCount(colony.lineages, 1)
 
-    const femaleId = addPerson(colony.population, {
+    const femaleId = addLivingPerson(colony.population, colony.lineages, {
       age: 22,
       sex: 0,
       cohesion: 210,
@@ -332,8 +300,6 @@ describe('Pairing', () => {
       maternalLineage: 2,
       firstNameId: 0,
     })
-    incrementLivingCount(colony.lineages, 2)
-    incrementLivingCount(colony.lineages, 2)
 
     const events = pairUp(colony, rng, 1960)
 

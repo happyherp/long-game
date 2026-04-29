@@ -1,4 +1,5 @@
-import { PopulationStore } from './types'
+import { LineageRegistry, PopulationStore } from './types'
+import { incrementLivingCount } from './lineage'
 
 export interface PersonAttrs {
   age: number
@@ -42,6 +43,17 @@ export function addPerson(store: PopulationStore, attrs: PersonAttrs): number {
   store.firstNameId[id] = attrs.firstNameId
 
   store.size++
+  return id
+}
+
+export function addLivingPerson(
+  store: PopulationStore,
+  lineages: LineageRegistry,
+  attrs: PersonAttrs,
+): number {
+  const id = addPerson(store, attrs)
+  incrementLivingCount(lineages, attrs.paternalLineage)
+  incrementLivingCount(lineages, attrs.maternalLineage)
   return id
 }
 

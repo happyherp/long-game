@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { applyDeaths } from '../../src/engine/deaths'
-import { createStore, addPerson, getAlive } from '../../src/engine/population'
-import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
+import { createStore, addLivingPerson, getAlive } from '../../src/engine/population'
+import { createLineageRegistry } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 
 describe('Deaths', () => {
@@ -11,7 +11,7 @@ describe('Deaths', () => {
     const rng = createRNG(123)
 
     for (let i = 0; i < 100; i++) {
-      addPerson(store, {
+      addLivingPerson(store, lineages, {
         age: 85,
         sex: 0,
         cohesion: 200,
@@ -21,8 +21,6 @@ describe('Deaths', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      incrementLivingCount(lineages, 0)
-      incrementLivingCount(lineages, 0)
     }
 
     expect(store.size).toBe(100)
@@ -38,7 +36,7 @@ describe('Deaths', () => {
     const lineages = createLineageRegistry()
     const rng = createRNG(456)
 
-    const id1 = addPerson(store, {
+    const id1 = addLivingPerson(store, lineages, {
       age: 90,
       sex: 0,
       cohesion: 200,
@@ -48,8 +46,6 @@ describe('Deaths', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(lineages, 0)
-    incrementLivingCount(lineages, 0)
 
     const events = applyDeaths(store, lineages, rng, 1960)
 
@@ -63,7 +59,7 @@ describe('Deaths', () => {
     const lineages = createLineageRegistry()
     const rng = createRNG(789)
 
-    const id1 = addPerson(store, {
+    const id1 = addLivingPerson(store, lineages, {
       age: 90,
       sex: 1,
       cohesion: 200,
@@ -73,10 +69,8 @@ describe('Deaths', () => {
       maternalLineage: 0,
       firstNameId: 0,
     })
-    incrementLivingCount(lineages, 0)
-    incrementLivingCount(lineages, 0)
 
-    const id2 = addPerson(store, {
+    const id2 = addLivingPerson(store, lineages, {
       age: 30,
       sex: 0,
       cohesion: 200,
@@ -86,8 +80,6 @@ describe('Deaths', () => {
       maternalLineage: 1,
       firstNameId: 0,
     })
-    incrementLivingCount(lineages, 1)
-    incrementLivingCount(lineages, 1)
 
     store.partnerId[id1] = id2
 
@@ -105,7 +97,7 @@ describe('Deaths', () => {
     const lineages = createLineageRegistry()
     const rng = createRNG(111)
 
-    addPerson(store, {
+    addLivingPerson(store, lineages, {
       age: 90,
       sex: 0,
       cohesion: 200,
@@ -115,8 +107,6 @@ describe('Deaths', () => {
       maternalLineage: 10,
       firstNameId: 0,
     })
-    incrementLivingCount(lineages, 5)
-    incrementLivingCount(lineages, 10)
 
     expect(lineages.livingCount[5]).toBe(1)
     expect(lineages.livingCount[10]).toBe(1)
@@ -143,7 +133,7 @@ describe('Deaths', () => {
       const lineages = createLineageRegistry()
 
       for (let i = 0; i < 1000; i++) {
-        addPerson(store, {
+        addLivingPerson(store, lineages, {
           age: testCase.age,
           sex: i % 2,
           cohesion: 200,
@@ -153,8 +143,6 @@ describe('Deaths', () => {
           maternalLineage: 0,
           firstNameId: 0,
         })
-        incrementLivingCount(lineages, 0)
-        incrementLivingCount(lineages, 0)
       }
 
       const localRng = rng.fork(`death-test-${testCase.age}`)
@@ -172,7 +160,7 @@ describe('Deaths', () => {
     const rng = createRNG(333)
 
     for (let i = 0; i < 10; i++) {
-      addPerson(store, {
+      addLivingPerson(store, lineages, {
         age: 90,
         sex: 0,
         cohesion: 200,
@@ -182,8 +170,6 @@ describe('Deaths', () => {
         maternalLineage: 0,
         firstNameId: 0,
       })
-      incrementLivingCount(lineages, 0)
-      incrementLivingCount(lineages, 0)
     }
 
     const events = applyDeaths(store, lineages, rng, 1960)
@@ -198,7 +184,7 @@ describe('Deaths', () => {
     const rng = createRNG(444)
 
     for (let i = 0; i < 50; i++) {
-      addPerson(store, {
+      addLivingPerson(store, lineages, {
         age: 80 + Math.floor(i / 10),
         sex: i % 2,
         cohesion: 200,
@@ -208,8 +194,6 @@ describe('Deaths', () => {
         maternalLineage: (i + 1) % 30,
         firstNameId: 0,
       })
-      incrementLivingCount(lineages, i % 30)
-      incrementLivingCount(lineages, (i + 1) % 30)
     }
 
     const initialSize = store.size
