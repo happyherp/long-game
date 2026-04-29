@@ -12,10 +12,15 @@ export default function App() {
 
   useEffect(() => {
     const initGame = async () => {
-      const saved = await loadGame()
-      if (saved) {
-        loadGameState(saved.colony, saved.seed)
-      } else {
+      try {
+        const saved = await loadGame()
+        if (saved) {
+          loadGameState(saved.colony, saved.seed)
+        } else {
+          newGame()
+        }
+      } catch (error) {
+        console.error('Failed to load saved game:', error)
         newGame()
       }
     }
