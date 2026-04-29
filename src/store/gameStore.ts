@@ -36,8 +36,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   setDoctrine: (doctrine: Doctrine) => {
     const state = get()
     if (!state.colony) return
-    state.colony.doctrine = doctrine
-    set({ colony: { ...state.colony } })
+    set({ colony: { ...state.colony, doctrine } })
   },
 
   newGame: () => {
