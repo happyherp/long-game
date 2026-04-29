@@ -8,19 +8,20 @@ import { GameOverScreen } from './components/GameOverScreen'
 import { loadGame, saveGame, deleteGame } from './persistence/db'
 
 export default function App() {
-  const { colony, seed, newGame, loadGame: loadGameState } = useGameStore()
+  const { colony, seed, newGame } = useGameStore()
 
   useEffect(() => {
     const initGame = async () => {
+      const { newGame: start, loadGame: restore } = useGameStore.getState()
       const saved = await loadGame()
       if (saved) {
-        loadGameState(saved.colony, saved.seed)
+        restore(saved.colony, saved.seed)
       } else {
-        newGame()
+        start()
       }
     }
     initGame()
-  }, [newGame, loadGameState])
+  }, [])
 
   useEffect(() => {
     if (colony) {
