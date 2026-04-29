@@ -54,7 +54,7 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
 
       const childFirstNameId = rng.nextInt(255)
       const childPaternalLineage = population.paternalLineage[fatherId]
-      const childMaternalLineage = population.paternalLineage[motherId]
+      const childMaternalLineage = population.maternalLineage[motherId]
 
       const childId = addPerson(population, {
         age: 0,
