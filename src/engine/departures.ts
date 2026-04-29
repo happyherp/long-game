@@ -1,5 +1,5 @@
 import { Colony, Doctrine, GameEvent } from './types'
-import { getAlive, removePerson } from './population'
+import { getAlive, removePerson, getSlot } from './population'
 import { decrementLivingCount } from './lineage'
 import { RNG } from './rng'
 
@@ -35,55 +35,56 @@ export function departureProbability(person: PersonSnapshot, partner: PersonSnap
 export function applyDepartures(colony: Colony, rng: RNG, year: number): GameEvent[] {
   const { population, doctrine, lineages } = colony
   const events: GameEvent[] = []
-  const toRemove: number[] = []
+  const toRemove: number[] = []  // stable IDs
 
-  for (const id of getAlive(population)) {
-    const age = population.age[id]
+  for (const slot of getAlive(population)) {
+    const age = population.age[slot]
     if (age < 13) continue
 
-    const partnerId = population.partnerId[id]
-    const hasPartner = partnerId >= 0
+    const partnerStableId = population.partnerId[slot]
+    const hasPartner = partnerStableId >= 0
 
-    const person = {
-      age,
-      cohesion: population.cohesion[id],
-    }
+    const person = { age, cohesion: population.cohesion[slot] }
 
-    const partnerObj = hasPartner
-      ? {
-          age: population.age[partnerId],
-          cohesion: population.cohesion[partnerId],
+    let partnerObj: PersonSnapshot | null = null
+    if (hasPartner) {
+      const partnerSlot = getSlot(population, partnerStableId)
+      if (partnerSlot >= 0) {
+        partnerObj = {
+          age: population.age[partnerSlot],
+          cohesion: population.cohesion[partnerSlot],
         }
-      : null
+      }
+    }
 
     const prob = departureProbability(person, partnerObj, doctrine)
 
     if (rng.next() < prob) {
-      toRemove.push(id)
-      events.push({
-        type: 'departure',
-        personId: id,
-        year,
-      })
+      toRemove.push(population.slotToId[slot])
+      events.push({ type: 'departure', personId: population.slotToId[slot], year })
     }
   }
 
-  toRemove.reverse()
+  for (const stableId of toRemove) {
+    const slot = getSlot(population, stableId)
+    if (slot === -1) continue  // already removed
 
-  for (const id of toRemove) {
-    const paternalLineage = population.paternalLineage[id]
-    const maternalLineage = population.maternalLineage[id]
-    const partnerId = population.partnerId[id]
+    const paternalLineage = population.paternalLineage[slot]
+    const maternalLineage = population.maternalLineage[slot]
+    const partnerStableId = population.partnerId[slot]
 
     decrementLivingCount(lineages, paternalLineage)
     decrementLivingCount(lineages, maternalLineage)
 
-    if (partnerId !== -1 && partnerId >= 0) {
-      population.married[partnerId] = 0
-      population.partnerId[partnerId] = -1
+    if (partnerStableId >= 0) {
+      const partnerSlot = getSlot(population, partnerStableId)
+      if (partnerSlot >= 0) {
+        population.married[partnerSlot] = 0
+        population.partnerId[partnerSlot] = -1
+      }
     }
 
-    removePerson(population, id)
+    removePerson(population, stableId)
   }
 
   return events

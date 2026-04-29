@@ -34,6 +34,10 @@ describe('Economy', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }
@@ -57,6 +61,10 @@ describe('Economy', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }
@@ -90,6 +98,10 @@ describe('Economy', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
 
@@ -101,6 +113,10 @@ describe('Economy', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }

@@ -35,6 +35,10 @@ describe('Pairing', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -46,6 +50,10 @@ describe('Pairing', () => {
       partnerId: -1,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -72,6 +80,10 @@ describe('Pairing', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -83,6 +95,10 @@ describe('Pairing', () => {
       partnerId: -1,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -94,6 +110,10 @@ describe('Pairing', () => {
       partnerId: -1,
       paternalLineage: 2,
       maternalLineage: 2,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -117,6 +137,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
       addLivingPerson(colony.population, colony.lineages, {
@@ -127,6 +151,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 1,
         maternalLineage: 1,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
       addLivingPerson(colony.population, colony.lineages, {
@@ -137,6 +165,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 2,
         maternalLineage: 2,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
     ]
@@ -150,6 +182,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 3,
         maternalLineage: 3,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
       addLivingPerson(colony.population, colony.lineages, {
@@ -160,6 +196,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 4,
         maternalLineage: 4,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
       addLivingPerson(colony.population, colony.lineages, {
@@ -170,6 +210,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 5,
         maternalLineage: 5,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
     ]
@@ -202,6 +246,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
       addLivingPerson(colony.population, colony.lineages, {
@@ -212,6 +260,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 1,
         maternalLineage: 1,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
       addLivingPerson(colony.population, colony.lineages, {
@@ -222,6 +274,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 2,
         maternalLineage: 2,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
     ]
@@ -235,6 +291,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 3,
         maternalLineage: 3,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
       addLivingPerson(colony.population, colony.lineages, {
@@ -245,6 +305,10 @@ describe('Pairing', () => {
         partnerId: -1,
         paternalLineage: 4,
         maternalLineage: 4,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       }),
     ]
@@ -276,6 +340,10 @@ describe('Pairing', () => {
       partnerId: 99,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -287,6 +355,10 @@ describe('Pairing', () => {
       partnerId: -1,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -298,6 +370,10 @@ describe('Pairing', () => {
       partnerId: -1,
       paternalLineage: 2,
       maternalLineage: 2,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 

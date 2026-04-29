@@ -23,6 +23,10 @@ describe('Population Store', () => {
       partnerId: 1,
       paternalLineage: 5,
       maternalLineage: 3,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 7,
     }
 
@@ -48,6 +52,10 @@ describe('Population Store', () => {
       partnerId: -1,
       paternalLineage: 1,
       maternalLineage: 2,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -60,7 +68,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const attrs: PersonAttrs = {
       age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     }
 
     addPerson(store, attrs)
@@ -73,7 +81,7 @@ describe('Population Store', () => {
     const store = createStore(2)
     const attrs: PersonAttrs = {
       age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     }
 
     addPerson(store, attrs)
@@ -89,7 +97,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const makeAttrs = (age: number): PersonAttrs => ({
       age, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     })
 
     const id0 = addPerson(store, makeAttrs(10))
@@ -110,7 +118,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const attrs: PersonAttrs = {
       age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     }
 
     addPerson(store, attrs)
@@ -125,7 +133,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const makeAttrs = (age: number): PersonAttrs => ({
       age, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     })
 
     addPerson(store, makeAttrs(10))
@@ -142,7 +150,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const attrs: PersonAttrs = {
       age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     }
 
     addPerson(store, attrs)
@@ -157,7 +165,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const attrs: PersonAttrs = {
       age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     }
 
     addPerson(store, attrs)
@@ -173,7 +181,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const makeAttrs = (age: number): PersonAttrs => ({
       age, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     })
 
     addPerson(store, makeAttrs(10))
@@ -190,7 +198,7 @@ describe('Population Store', () => {
     const store = createStore(10)
     const attrs: PersonAttrs = {
       age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1,
-      paternalLineage: 0, maternalLineage: 0, firstNameId: 0,
+      paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0,
     }
 
     addPerson(store, attrs)
