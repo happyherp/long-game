@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import { computeMetrics, computeMedianAge, computeRollingTFR, toSnapshot } from '../../src/engine/metrics'
-import { createStore, addPerson } from '../../src/engine/population'
+import { createStore, addPerson, getAlive } from '../../src/engine/population'
 import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
+import { createRNG } from '../../src/engine/rng'
+import { tick } from '../../src/engine/tick'
 import { Colony } from '../../src/engine/types'
 
 describe('Metrics', () => {
@@ -120,6 +122,68 @@ describe('Metrics', () => {
     expect(tfr).toBeCloseTo((3.0 + 3.5 + 4.0) / 3, 1)
   })
 
+  it('computes non-zero TFR after a year with births (rolling births per reproductive female)', () => {
+    function runOneYearWithSeed(seed: number): { colony: Colony; births: number; reproductiveFemales: number } | null {
+      const colony = createTestColony()
+
+      const numWomen = 40
+      for (let i = 0; i < numWomen; i++) {
+        const motherId = addPerson(colony.population, {
+          age: 25,
+          sex: 0,
+          cohesion: 255,
+          married: 1,
+          partnerId: -1,
+          paternalLineage: 0,
+          maternalLineage: 0,
+          firstNameId: 0,
+        })
+        incrementLivingCount(colony.lineages, 0)
+        incrementLivingCount(colony.lineages, 0)
+
+        const fatherId = addPerson(colony.population, {
+          age: 27,
+          sex: 1,
+          cohesion: 255,
+          married: 1,
+          partnerId: motherId,
+          paternalLineage: 1,
+          maternalLineage: 1,
+          firstNameId: 0,
+        })
+        incrementLivingCount(colony.lineages, 1)
+        incrementLivingCount(colony.lineages, 1)
+
+        colony.population.partnerId[motherId] = fatherId
+      }
+
+      const rng = createRNG(seed)
+      const result = tick(colony, rng.fork('tfr-test'))
+      const births = result.events.filter((e) => e.type === 'birth').length
+      if (births === 0) return null
+
+      const reproductiveFemales = Array.from(getAlive(colony.population)).filter((id) => {
+        const age = colony.population.age[id]
+        return colony.population.sex[id] === 0 && age >= 15 && age <= 49
+      }).length
+
+      return { colony, births, reproductiveFemales }
+    }
+
+    let data: { colony: Colony; births: number; reproductiveFemales: number } | null = null
+    for (let seed = 1; seed <= 2000; seed++) {
+      data = runOneYearWithSeed(seed)
+      if (data) break
+    }
+    if (!data) throw new Error('Failed to produce a birth in test setup')
+
+    expect(data.colony.history).toHaveLength(1)
+
+    const metrics = computeMetrics(data.colony)
+    expect(metrics.tfr).toBeCloseTo(data.births / data.reproductiveFemales, 5)
+    expect(metrics.tfr).toBeGreaterThan(0)
+  })
+
   it('creates snapshot from metrics', () => {
     const colony = createTestColony()
     addPerson(colony.population, {
@@ -136,7 +200,7 @@ describe('Metrics', () => {
     incrementLivingCount(colony.lineages, 0)
 
     const metrics = computeMetrics(colony)
-    const snapshot = toSnapshot(metrics, 1960, 10, 2, 1)
+    const snapshot = toSnapshot(colony, metrics, 1960, 10, 2, 1)
 
     expect(snapshot.year).toBe(1960)
     expect(snapshot.births).toBe(10)

@@ -29,7 +29,7 @@ export function tick(colony: Colony, rng: RNG): TickResult {
   const metrics = computeMetrics(colony)
 
   colony.history.push(
-    toSnapshot(metrics, year, birthEvents.length, deathEvents.length, departureEvents.length),
+    toSnapshot(colony, metrics, year, birthEvents.length, deathEvents.length, departureEvents.length),
   )
 
   colony.year++
