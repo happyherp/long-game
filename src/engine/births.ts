@@ -1,5 +1,5 @@
 import { Colony, GameEvent } from './types'
-import { getAlive, addLivingPerson } from './population'
+import { getAlive, addLivingPerson, getSlot } from './population'
 import { RNG } from './rng'
 
 function ageCurve(age: number): number {
@@ -26,18 +26,23 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
   const { population } = colony
   const events: GameEvent[] = []
 
-  for (const motherId of getAlive(population)) {
-    const age = population.age[motherId]
-    const sex = population.sex[motherId]
-    const married = population.married[motherId]
-    const cohesion = population.cohesion[motherId]
+  for (const motherSlot of getAlive(population)) {
+    const age = population.age[motherSlot]
+    const sex = population.sex[motherSlot]
+    const married = population.married[motherSlot]
+    const cohesion = population.cohesion[motherSlot]
 
     if (sex !== 0 || age < 16 || age > 44 || married === 0) {
       continue
     }
 
-    const fatherId = population.partnerId[motherId]
-    if (fatherId === -1 || fatherId < 0) {
+    const fatherStableId = population.partnerId[motherSlot]
+    if (fatherStableId < 0) {
+      continue
+    }
+
+    const fatherSlot = getSlot(population, fatherStableId)
+    if (fatherSlot < 0) {
       continue
     }
 
@@ -45,17 +50,19 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
 
     if (rng.next() < prob) {
       const childSex = rng.nextInt(2)
-      const motherCohesionVal = population.cohesion[motherId]
-      const fatherCohesionVal = population.cohesion[fatherId]
+      const motherCohesionVal = population.cohesion[motherSlot]
+      const fatherCohesionVal = population.cohesion[fatherSlot]
       const avgCohesion = (motherCohesionVal + fatherCohesionVal) / 2
       const jitter = (rng.next() - 0.5) * 40
       const childCohesion = Math.max(0, Math.min(255, Math.round(avgCohesion + jitter)))
 
       const childFirstNameId = rng.nextInt(255)
-      const childPaternalLineage = population.paternalLineage[fatherId]
-      const childMaternalLineage = population.maternalLineage[motherId]
+      const childPaternalLineage = population.paternalLineage[fatherSlot]
+      const childMaternalLineage = population.maternalLineage[motherSlot]
 
-      const childId = addLivingPerson(population, colony.lineages, {
+      const motherStableId = population.slotToId[motherSlot]
+
+      const childStableId = addLivingPerson(population, colony.lineages, {
         age: 0,
         sex: childSex,
         cohesion: childCohesion,
@@ -63,14 +70,18 @@ export function applyBirths(colony: Colony, rng: RNG, year: number): GameEvent[]
         partnerId: -1,
         paternalLineage: childPaternalLineage,
         maternalLineage: childMaternalLineage,
+        fatherId: fatherStableId,
+        motherId: motherStableId,
+        origin: 0,
+        arrivalYear: year,
         firstNameId: childFirstNameId,
       })
 
       events.push({
         type: 'birth',
-        personId: childId,
+        personId: childStableId,
         year,
-        payload: { motherId, fatherId },
+        payload: { motherId: motherStableId, fatherId: fatherStableId },
       })
     }
   }

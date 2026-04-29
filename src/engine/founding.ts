@@ -1,5 +1,5 @@
 import { Colony, PopulationStore } from './types'
-import { createStore, addLivingPerson } from './population'
+import { createStore, addLivingPerson, getSlot } from './population'
 import { createLineageRegistry } from './lineage'
 import { RNG } from './rng'
 import { FOUNDER_SURNAMES } from './names'
@@ -33,7 +33,7 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
   const rngLineage = rng.fork('lineage')
   const rngCohesion = rng.fork('cohesion')
 
-  const people: Array<{ id: number; age: number; sex: number }> = []
+  const people: Array<{ stableId: number; age: number; sex: number }> = []
 
   for (const group of AGE_DISTRIBUTION) {
     for (let i = 0; i < group.count; i++) {
@@ -52,7 +52,7 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
         cohesion = 200 + rngCohesion.nextInt(31)
       }
 
-      const id = addLivingPerson(population, lineages, {
+      const stableId = addLivingPerson(population, lineages, {
         age,
         sex,
         cohesion,
@@ -60,11 +60,15 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
         partnerId: -1,
         paternalLineage,
         maternalLineage,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: FOUNDING_YEAR,
         firstNameId,
       })
 
       if (age >= 18) {
-        people.push({ id, age, sex })
+        people.push({ stableId, age, sex })
       }
     }
   }
@@ -89,26 +93,29 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
 
 function pairUnmarriedAdults(
   population: PopulationStore,
-  adults: Array<{ id: number; age: number; sex: number }>,
+  adults: Array<{ stableId: number; age: number; sex: number }>,
   rng: RNG,
 ): void {
   const males = adults.filter((a) => a.sex === 1)
   const females = adults.filter((a) => a.sex === 0)
 
-  const malesFemales = Math.min(males.length, females.length)
+  const pairCount = Math.min(males.length, females.length)
 
-  for (let i = 0; i < malesFemales; i++) {
+  for (let i = 0; i < pairCount; i++) {
     const maleIdx = rng.nextInt(males.length - i)
     const femaleIdx = rng.nextInt(females.length - i)
 
     const male = males[maleIdx]
     const female = females[femaleIdx]
 
-    population.married[male.id] = 1
-    population.partnerId[male.id] = female.id
+    const maleSlot = getSlot(population, male.stableId)
+    const femaleSlot = getSlot(population, female.stableId)
 
-    population.married[female.id] = 1
-    population.partnerId[female.id] = male.id
+    population.married[maleSlot] = 1
+    population.partnerId[maleSlot] = female.stableId
+
+    population.married[femaleSlot] = 1
+    population.partnerId[femaleSlot] = male.stableId
 
     const lastMaleIdx = males.length - 1 - i
     const temp1 = males[maleIdx]

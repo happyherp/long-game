@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { applyBirths, birthProbability } from '../../src/engine/births'
-import { createStore, addLivingPerson, getAlive } from '../../src/engine/population'
+import { createStore, addLivingPerson, getAlive, getSlot } from '../../src/engine/population'
 import { createLineageRegistry, getLivingCount } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { Colony } from '../../src/engine/types'
@@ -35,6 +35,10 @@ describe('Births', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -55,6 +59,10 @@ describe('Births', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -66,11 +74,15 @@ describe('Births', () => {
       partnerId: youngGirlId,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
-    colony.population.married[youngGirlId] = 1
-    colony.population.partnerId[youngGirlId] = malePaid
+    colony.population.married[getSlot(colony.population, youngGirlId)] = 1
+    colony.population.partnerId[getSlot(colony.population, youngGirlId)] = malePaid
 
     const events = applyBirths(colony, rng, 1960)
     expect(events).toHaveLength(0)
@@ -82,27 +94,37 @@ describe('Births', () => {
 
     let totalBirths = 0
     for (let i = 0; i < 10; i++) {
+      const fatherId = addLivingPerson(colony.population, colony.lineages, {
+        age: 27,
+        sex: 1,
+        cohesion: 235,
+        married: 1,
+        partnerId: -1,
+        paternalLineage: 1,
+        maternalLineage: 1,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
+        firstNameId: 0,
+      })
+
       const motherId = addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 0,
         cohesion: 240,
         married: 1,
-        partnerId: 100 + i,
+        partnerId: fatherId,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
 
-      addLivingPerson(colony.population, colony.lineages, {
-        age: 27,
-        sex: 1,
-        cohesion: 235,
-        married: 1,
-        partnerId: motherId,
-        paternalLineage: 1,
-        maternalLineage: 1,
-        firstNameId: 0,
-      })
+      colony.population.partnerId[getSlot(colony.population, fatherId)] = motherId
     }
 
     const events = applyBirths(colony, rng, 1960)
@@ -124,6 +146,10 @@ describe('Births', () => {
       partnerId: 1,
       paternalLineage: 5,
       maternalLineage: 10,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -135,6 +161,10 @@ describe('Births', () => {
       partnerId: motherId,
       paternalLineage: 7,
       maternalLineage: 12,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -142,8 +172,9 @@ describe('Births', () => {
 
     if (events.length > 0) {
       const childId = events[0].personId
-      expect(colony.population.paternalLineage[childId]).toBe(7)
-      expect(colony.population.maternalLineage[childId]).toBe(5)
+      const childSlot = getSlot(colony.population, childId)
+      expect(colony.population.paternalLineage[childSlot]).toBe(7)
+      expect(colony.population.maternalLineage[childSlot]).toBe(5)
     }
   })
 
@@ -159,6 +190,10 @@ describe('Births', () => {
       partnerId: 1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -170,6 +205,10 @@ describe('Births', () => {
       partnerId: motherId,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -177,7 +216,7 @@ describe('Births', () => {
 
     if (events.length > 0) {
       const childId = events[0].personId
-      const childCohesion = colony.population.cohesion[childId]
+      const childCohesion = colony.population.cohesion[getSlot(colony.population, childId)]
       const expectedAvg = (200 + 240) / 2
 
       expect(childCohesion).toBeGreaterThanOrEqual(expectedAvg - 25)
@@ -197,6 +236,10 @@ describe('Births', () => {
       partnerId: 1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -208,6 +251,10 @@ describe('Births', () => {
       partnerId: motherId,
       paternalLineage: 1,
       maternalLineage: 1,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 
@@ -252,28 +299,38 @@ describe('Births', () => {
     const womenIds: number[] = []
 
     for (let i = 0; i < numWomen; i++) {
+      const fatherId = addLivingPerson(colony.population, colony.lineages, {
+        age: 27,
+        sex: 1,
+        cohesion: 230,
+        married: 1,
+        partnerId: -1,
+        paternalLineage: 1,
+        maternalLineage: 1,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
+        firstNameId: 0,
+      })
+
       const womenId = addLivingPerson(colony.population, colony.lineages, {
         age: 25,
         sex: 0,
         cohesion: 235,
         married: 1,
-        partnerId: 100 + i,
+        partnerId: fatherId,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
       womenIds.push(womenId)
 
-      addLivingPerson(colony.population, colony.lineages, {
-        age: 27,
-        sex: 1,
-        cohesion: 230,
-        married: 1,
-        partnerId: womenId,
-        paternalLineage: 1,
-        maternalLineage: 1,
-        firstNameId: 0,
-      })
+      colony.population.partnerId[getSlot(colony.population, fatherId)] = womenId
     }
 
     let totalBirths = 0

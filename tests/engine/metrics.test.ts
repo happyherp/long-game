@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { computeMetrics, computeMedianAge, computeRollingTFR, toSnapshot } from '../../src/engine/metrics'
-import { createStore, addLivingPerson, addPerson, getAlive } from '../../src/engine/population'
+import { createStore, addLivingPerson, addPerson, getAlive, getSlot } from '../../src/engine/population'
 import { createLineageRegistry, incrementLivingCount } from '../../src/engine/lineage'
 import { createRNG } from '../../src/engine/rng'
 import { tick } from '../../src/engine/tick'
@@ -36,6 +36,10 @@ describe('Metrics', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }
@@ -48,9 +52,9 @@ describe('Metrics', () => {
   it('computes median age correctly', () => {
     const colony = createTestColony()
 
-    addLivingPerson(colony.population, colony.lineages, { age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
-    addLivingPerson(colony.population, colony.lineages, { age: 30, sex: 1, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
-    addLivingPerson(colony.population, colony.lineages, { age: 40, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, firstNameId: 0 })
+    addLivingPerson(colony.population, colony.lineages, { age: 20, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0 })
+    addLivingPerson(colony.population, colony.lineages, { age: 30, sex: 1, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0 })
+    addLivingPerson(colony.population, colony.lineages, { age: 40, sex: 0, cohesion: 150, married: 0, partnerId: -1, paternalLineage: 0, maternalLineage: 0, fatherId: -1, motherId: -1, origin: 0, arrivalYear: 1960, firstNameId: 0 })
 
     const median = computeMedianAge(colony.population)
     expect(median).toBe(30)
@@ -70,6 +74,10 @@ describe('Metrics', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
       addLivingPerson(mediumColony.population, mediumColony.lineages, {
@@ -80,6 +88,10 @@ describe('Metrics', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
       addLivingPerson(highColony.population, highColony.lineages, {
@@ -90,6 +102,10 @@ describe('Metrics', () => {
         partnerId: -1,
         paternalLineage: 0,
         maternalLineage: 0,
+        fatherId: -1,
+        motherId: -1,
+        origin: 0,
+        arrivalYear: 1960,
         firstNameId: 0,
       })
     }
@@ -124,6 +140,10 @@ describe('Metrics', () => {
           partnerId: -1,
           paternalLineage: 0,
           maternalLineage: 0,
+          fatherId: -1,
+          motherId: -1,
+          origin: 0,
+          arrivalYear: 1960,
           firstNameId: 0,
         })
         incrementLivingCount(colony.lineages, 0)
@@ -137,12 +157,16 @@ describe('Metrics', () => {
           partnerId: motherId,
           paternalLineage: 1,
           maternalLineage: 1,
+          fatherId: -1,
+          motherId: -1,
+          origin: 0,
+          arrivalYear: 1960,
           firstNameId: 0,
         })
         incrementLivingCount(colony.lineages, 1)
         incrementLivingCount(colony.lineages, 1)
 
-        colony.population.partnerId[motherId] = fatherId
+        colony.population.partnerId[getSlot(colony.population, motherId)] = fatherId
       }
 
       const rng = createRNG(seed)
@@ -182,6 +206,10 @@ describe('Metrics', () => {
       partnerId: -1,
       paternalLineage: 0,
       maternalLineage: 0,
+      fatherId: -1,
+      motherId: -1,
+      origin: 0,
+      arrivalYear: 1960,
       firstNameId: 0,
     })
 

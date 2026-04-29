@@ -5,19 +5,19 @@ import { RNG } from './rng'
 export function pairUp(colony: Colony, rng: RNG, year: number): GameEvent[] {
   const { population, doctrine } = colony
 
-  const males: number[] = []
-  const females: number[] = []
+  const males: number[] = []    // slots
+  const females: number[] = []  // slots
 
-  for (const id of getAlive(population)) {
-    const age = population.age[id]
-    const married = population.married[id]
-    const sex = population.sex[id]
+  for (const slot of getAlive(population)) {
+    const age = population.age[slot]
+    const married = population.married[slot]
+    const sex = population.sex[slot]
 
     if (age >= doctrine.marriageAge && married === 0) {
       if (sex === 1) {
-        males.push(id)
+        males.push(slot)
       } else {
-        females.push(id)
+        females.push(slot)
       }
     }
   }
@@ -29,22 +29,28 @@ export function pairUp(colony: Colony, rng: RNG, year: number): GameEvent[] {
   const events: GameEvent[] = []
 
   for (let i = 0; i < pairs; i++) {
-    const maleId = males[i]
-    const femaleId = females[i]
+    const maleSlot = males[i]
+    const femaleSlot = females[i]
 
-    population.married[maleId] = 1
-    population.partnerId[maleId] = femaleId
+    const maleStableId = population.slotToId[maleSlot]
+    const femaleStableId = population.slotToId[femaleSlot]
 
-    population.married[femaleId] = 1
-    population.partnerId[femaleId] = maleId
+    population.married[maleSlot] = 1
+    population.partnerId[maleSlot] = femaleStableId
+
+    population.married[femaleSlot] = 1
+    population.partnerId[femaleSlot] = maleStableId
 
     events.push({
       type: 'pairing',
-      personId: maleId,
+      personId: maleStableId,
       year,
-      payload: { partnerId: femaleId },
+      payload: { partnerId: femaleStableId },
     })
   }
+
+  // rng parameter reserved for future probabilistic pairing doctrines
+  void rng
 
   return events
 }
