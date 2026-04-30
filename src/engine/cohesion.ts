@@ -1,4 +1,4 @@
-import { Colony } from './types'
+import { Colony, Doctrine } from './types'
 import { getAlive, getSlot } from './population'
 import { RNG } from './rng'
 
@@ -43,7 +43,7 @@ export function applyCohesionDrift(colony: Colony, rng: RNG): void {
 function applyDriftFemale(
   person: { age: number; sex: number; cohesion: number; married: number; origin: number; arrivalYear: number },
   partner: { cohesion: number } | null,
-  doctrine: any,
+  doctrine: Doctrine,
   year: number,
   rng: RNG,
 ): void {
@@ -82,7 +82,7 @@ function applyDriftFemale(
 function applyDriftMale(
   person: { age: number; sex: number; cohesion: number; married: number; origin: number; arrivalYear: number },
   partner: { cohesion: number } | null,
-  doctrine: any,
+  doctrine: Doctrine,
   year: number,
   rng: RNG,
 ): void {

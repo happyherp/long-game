@@ -52,9 +52,9 @@ export function grantSchism(
   const daughterColony: Colony = {
     id: federation.colonies.length,
     name: schism.proposedName,
-    population: createDaughterPopulation(parentColony, schism.memberIds),
+    population: createDaughterPopulation(parentColony),
     doctrine: schism.proposedDoctrine,
-    lineages: createDaughterLineageRegistry(parentColony.lineages, schism.memberIds),
+    lineages: createDaughterLineageRegistry(parentColony.lineages),
     treasury: Math.floor(parentColony.treasury * (schism.memberIds.length / parentColony.population.size)),
     year: parentColony.year,
     history: [],
@@ -163,14 +163,13 @@ function deriveSchismName(
   return `${parentName} ${suffixes[Math.floor(rng.next() * suffixes.length)]}`
 }
 
-function createDaughterPopulation(parent: Colony, memberIds: number[]): Colony['population'] {
+function createDaughterPopulation(parent: Colony): Colony['population'] {
   // This is a placeholder - would need to implement population transfer logic
   return parent.population // Simplified for now
 }
 
 function createDaughterLineageRegistry(
   parentRegistry: Colony['lineages'],
-  memberIds: number[],
 ): Colony['lineages'] {
   // This is a placeholder - would need to copy relevant lineages
   return parentRegistry // Simplified for now

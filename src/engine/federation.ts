@@ -1,4 +1,4 @@
-import { Federation, Colony, FederationSnapshot, GameEvent, ColonyMetrics } from './types'
+import { Federation, FederationSnapshot, GameEvent, ColonyMetrics } from './types'
 import { getAlive } from './population'
 import { applyDeaths } from './deaths'
 import { pairUp } from './pairUp'

@@ -1,4 +1,4 @@
-import { Colony, Building } from './types'
+import { Colony } from './types'
 
 export function canBuildClinic(colony: Colony): boolean {
   return colony.treasury >= 25_000

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { Federation, Colony, Doctrine, GameEvent, SchismEvent } from '../engine/types'
+import { Federation, Colony, Doctrine } from '../engine/types'
 import { createRNG } from '../engine/rng'
 import { generateFoundingColony } from '../engine/founding'
 import { federationTick } from '../engine/federation'
@@ -106,7 +106,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const schism = state.federation.pendingSchisms[schismIndex]
     if (!schism) return
 
-    const events = grantSchism(state.federation, schism)
+    grantSchism(state.federation, schism)
     
     // Remove from pending
     state.federation.pendingSchisms.splice(schismIndex, 1)
@@ -124,7 +124,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     const schism = state.federation.pendingSchisms[schismIndex]
     if (!schism) return
 
-    const events = refuseSchism(state.federation, schism)
+    refuseSchism(state.federation, schism)
     
     // Remove from pending
     state.federation.pendingSchisms.splice(schismIndex, 1)

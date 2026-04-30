@@ -1,7 +1,4 @@
-import { Colony, Doctrine, PopulationStore, LineageRegistry, Federation, YearSnapshot } from './types'
-import { createStore, addPerson, getAlive } from './population'
-import { createLineageRegistry } from './lineage'
-import { RNG } from './rng'
+import { Colony, Federation } from './types'
 
 // P1 Save format (simplified)
 interface SaveStateV1 {

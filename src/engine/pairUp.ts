@@ -1,5 +1,5 @@
 import { Colony, GameEvent } from './types'
-import { getAlive, getSlot } from './population'
+import { getAlive } from './population'
 import { RNG } from './rng'
 
 export function pairUp(colony: Colony, rng: RNG): GameEvent[] {

@@ -9,7 +9,7 @@ import { GameOverScreen } from './components/GameOverScreen'
 import { loadGame, saveGame, deleteGame } from './persistence/db'
 
 export default function App() {
-  const { federation, seed, newGame, loadGame: loadToStore, gameOver } = useGameStore()
+  const { federation, seed, newGame, loadGame: loadToStore } = useGameStore()
 
   useEffect(() => {
     const initGame = async () => {
@@ -26,6 +26,7 @@ export default function App() {
       }
     }
     initGame()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

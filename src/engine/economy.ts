@@ -1,6 +1,4 @@
 import { Colony, Doctrine, LandType } from './types'
-import { getAlive } from './population'
-import { hasDairyPlant, hasClinic } from './buildings'
 
 const BASE_YIELD: Record<LandType, number> = {
   jungleClearing: 30,

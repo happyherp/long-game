@@ -1,5 +1,5 @@
 import { DBSchema, openDB } from 'idb'
-import { Federation } from '../engine/types'
+import { Colony, Federation } from '../engine/types'
 import { migrateV1toV2 } from '../engine/migrate'
 
 const DB_NAME = 'long-game'
@@ -10,7 +10,7 @@ const STORE_NAME = 'saves'
 interface SaveStateV1 {
   version: 1
   seed: number
-  colony: any // Colony with limited doctrine
+  colony: Colony // Colony with limited doctrine
 }
 
 // V2 types
@@ -43,7 +43,7 @@ export async function loadGame(): Promise<SaveStateV2 | null> {
     if (!save) return null
 
     // Check if it's V1 and migrate
-    if (save.version === 1 as any) {
+    if (save.version === 1 as number) {
       const v1Save = save as unknown as SaveStateV1
       const v2Save = migrateV1toV2(v1Save)
       // Save the migrated version
