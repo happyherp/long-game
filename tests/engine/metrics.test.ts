@@ -9,18 +9,46 @@ import { Colony } from '../../src/engine/types'
 describe('Metrics', () => {
   function createTestColony(): Colony {
     return {
+      id: 0,
       name: 'Test',
       population: createStore(300),
       doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
+        // Marriage
+        marriageDoctrine: 'courtship',
         marriageAge: 18,
+        marriageOutside: 'forbidden',
+        // Religion / visible markers
+        baptismAge: 'infant',
+        shunning: true,
+        worshipLanguage: 'plautdietsch',
+        plainDress: true,
+        headCovering: true,
+        beardForMarried: true,
+        sundayObservance: true,
+        // Education
+        englishSchool: false,
+        higherEdMen: 'forbidden',
+        higherEdWomen: 'forbidden',
+        // Technology
+        smartphones: false,
+        motorizedFarming: false,
+        gridElectricity: false,
+        // Outside contact
+        outsideTrade: 'restricted',
+        inflowPolicy: 'closed',
       },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      foundingYear: 1960,
+      modernityPressure: 0,
+      economy: {
+        parcels: [],
+        buildings: [],
+      },
+      pairingRecords: new Map(),
+      flags: {},
     }
   }
 

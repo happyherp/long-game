@@ -7,23 +7,63 @@ import { Colony } from '../../src/engine/types'
 describe('Economy', () => {
   function createTestColony(): Colony {
     return {
+      id: 0,
       name: 'Test',
       population: createStore(300),
       doctrine: {
-        smartphones: false,
-        englishSchool: false,
-        plainDress: true,
+        // Marriage
+        marriageDoctrine: 'courtship',
         marriageAge: 19,
+        marriageOutside: 'forbidden',
+        // Religion / visible markers
+        baptismAge: 'infant',
+        shunning: true,
+        worshipLanguage: 'plautdietsch',
+        plainDress: true,
+        headCovering: true,
+        beardForMarried: true,
+        sundayObservance: true,
+        // Education
+        englishSchool: false,
+        higherEdMen: 'forbidden',
+        higherEdWomen: 'forbidden',
+        // Technology
+        smartphones: false,
+        motorizedFarming: false,
+        gridElectricity: false,
+        // Outside contact
+        outsideTrade: 'restricted',
+        inflowPolicy: 'closed',
       },
       lineages: createLineageRegistry(),
       treasury: 50000,
       year: 1960,
       history: [],
+      foundingYear: 1960,
+      modernityPressure: 0,
+      economy: {
+        parcels: [],
+        buildings: [],
+      },
+      pairingRecords: new Map(),
+      flags: {},
     }
   }
 
   it('adds output from adults 18-65', () => {
     const colony = createTestColony()
+    
+    // Add land parcel so colony generates output (need enough to exceed expenses)
+    // 50 adults * 600 expenses = 30,000. Need output > 30,000
+    // Output = hectares * 100 * productivity * laborMult * techMult
+    // With 1000 hectares: 1000 * 100 * 1.0 * 1 * 1 = 100,000 (profitable)
+    colony.economy.parcels = [{
+      id: 'test-land',
+      type: 'farmland',
+      hectares: 1000,
+      productivity: 1.0,
+      purchaseYear: 1960,
+    }]
 
     for (let i = 0; i < 50; i++) {
       addLivingPerson(colony.population, colony.lineages, {

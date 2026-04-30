@@ -9,7 +9,14 @@ export default [
   { ignores: ['dist', 'node_modules'] },
   js.configs.recommended,
   reactPlugin.configs.flat['jsx-runtime'],
-  reactHooksPlugin.configs['recommended-latest'],
+  {
+    plugins: {
+      'react-hooks': reactHooksPlugin,
+    },
+    rules: {
+      ...reactHooksPlugin.configs.recommended.rules,
+    },
+  },
   {
     languageOptions: {
       globals: {
@@ -27,7 +34,7 @@ export default [
       '@typescript-eslint': tsPlugin,
     },
     rules: {
-      ...tsPlugin.configs['recommended'].rules,
+      ...tsPlugin.configs.recommended.rules,
       'react/prop-types': 'off',
     },
   },

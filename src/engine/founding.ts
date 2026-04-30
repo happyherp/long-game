@@ -6,7 +6,7 @@ import { FOUNDER_SURNAMES } from './names'
 
 const FOUNDING_POPULATION = 280
 const FOUNDING_YEAR = 1960
-const FOUNDING_TREASURY = 50000
+const FOUNDING_TREASURY = 150000
 
 interface AgeGroup {
   minAge: number
@@ -76,18 +76,54 @@ export function generateFoundingColony(rng: RNG, colonyName: string): Colony {
   pairUnmarriedAdults(population, people, rngPairing)
 
   return {
+    id: 0,
     name: colonyName,
     population,
     doctrine: {
-      smartphones: false,
-      englishSchool: false,
-      plainDress: true,
+      // Marriage
+      marriageDoctrine: 'courtship',
       marriageAge: 19,
+      marriageOutside: 'forbidden',
+      // Religion / visible markers
+      baptismAge: 'infant',
+      shunning: true,
+      worshipLanguage: 'plautdietsch',
+      plainDress: true,
+      headCovering: true,
+      beardForMarried: true,
+      sundayObservance: true,
+      // Education
+      englishSchool: false,
+      higherEdMen: 'forbidden',
+      higherEdWomen: 'forbidden',
+      // Technology
+      smartphones: false,
+      motorizedFarming: false,
+      gridElectricity: false,
+      // Outside contact
+      outsideTrade: 'restricted',
+      inflowPolicy: 'closed',
     },
     lineages,
     treasury: FOUNDING_TREASURY,
     year: FOUNDING_YEAR,
     history: [],
+    foundingYear: FOUNDING_YEAR,
+    modernityPressure: 0,
+    economy: {
+      parcels: [
+        {
+          id: 'founding-land',
+          type: 'jungleClearing',
+          hectares: 3000,
+          productivity: 0.4,
+          purchaseYear: FOUNDING_YEAR,
+        },
+      ],
+      buildings: [],
+    },
+    pairingRecords: new Map(),
+    flags: {},
   }
 }
 

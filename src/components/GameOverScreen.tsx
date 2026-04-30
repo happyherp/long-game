@@ -2,9 +2,15 @@ import { useGameStore } from '../store/gameStore'
 import { computeMetrics } from '../engine/metrics'
 
 export function GameOverScreen() {
-  const { colony, gameOverReason, newGame } = useGameStore()
+  const { federation, selectedColonyId, gameOverReason, newGame } = useGameStore()
 
-  if (!colony || !gameOverReason) return null
+  if (!federation || !gameOverReason) return null
+
+  const colony = selectedColonyId 
+    ? federation.colonies.find(c => c.id === selectedColonyId) 
+    : federation.colonies[0]
+  
+  if (!colony) return null
 
   const metrics = computeMetrics(colony)
 

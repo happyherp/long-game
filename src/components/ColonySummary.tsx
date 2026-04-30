@@ -2,19 +2,28 @@ import { useGameStore } from '../store/gameStore'
 import { computeMetrics } from '../engine/metrics'
 
 export function ColonySummary() {
-  const { colony } = useGameStore()
+  const { federation, selectedColonyId } = useGameStore()
 
+  if (!federation || selectedColonyId === null) return null
+
+  const colony = federation.colonies.find(c => c.id === selectedColonyId)
   if (!colony) return null
 
   const metrics = computeMetrics(colony)
+  const totalPop = federation.colonies.reduce((sum, c) => sum + c.population.size, 0)
+  const totalTreasury = federation.colonies.reduce((sum, c) => sum + c.treasury, 0)
 
   return (
     <div className="bg-white shadow p-4 rounded mb-4">
       <h2 className="text-xl font-bold mb-4">Colony Summary</h2>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <p className="text-gray-600">Population</p>
+          <p className="text-gray-600">Colony Population</p>
           <p className="text-2xl font-bold">{metrics.totalPopulation}</p>
+        </div>
+        <div>
+          <p className="text-gray-600">Federation Total</p>
+          <p className="text-2xl font-bold">{totalPop}</p>
         </div>
         <div>
           <p className="text-gray-600">Sex Ratio (M:F)</p>
@@ -37,8 +46,16 @@ export function ColonySummary() {
           </p>
         </div>
         <div>
-          <p className="text-gray-600">Treasury</p>
-          <p className="text-2xl font-bold">${metrics.treasury.toLocaleString()}</p>
+          <p className="text-gray-600">Colony Treasury</p>
+          <p className={`text-2xl font-bold ${colony.treasury < 0 ? 'text-red-600' : ''}`}>
+            ${colony.treasury.toLocaleString()}
+          </p>
+        </div>
+        <div>
+          <p className="text-gray-600">Federation Treasury</p>
+          <p className={`text-2xl font-bold ${totalTreasury < 0 ? 'text-red-600' : ''}`}>
+            ${totalTreasury.toLocaleString()}
+          </p>
         </div>
       </div>
 

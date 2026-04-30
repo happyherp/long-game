@@ -26,14 +26,56 @@ export interface LineageRegistry {
   livingCount: Uint32Array
 }
 
+// Full V1 Doctrine from Phase 2
 export interface Doctrine {
-  smartphones: boolean
-  englishSchool: boolean
+  // Marriage
+  marriageDoctrine: 'courtship' | 'lateMarriage' | 'modern'
+  marriageAge: number      // 17–22
+  marriageOutside: 'forbidden' | 'permitted'
+
+  // Religion / visible markers
+  baptismAge: 'infant' | 'sixteen' | 'believer'
+  shunning: boolean
+  worshipLanguage: 'plautdietsch' | 'highGerman' | 'english'
   plainDress: boolean
-  marriageAge: number
+  headCovering: boolean
+  beardForMarried: boolean
+  sundayObservance: boolean
+
+  // Education
+  englishSchool: boolean
+  higherEdMen: 'forbidden' | 'tradeOnly' | 'permitted' | 'encouraged'
+  higherEdWomen: 'forbidden' | 'tradeOnly' | 'permitted' | 'encouraged'
+
+  // Technology
+  smartphones: boolean
+  motorizedFarming: boolean
+  gridElectricity: boolean
+
+  // Outside contact
+  outsideTrade: 'open' | 'restricted' | 'closed'
+  inflowPolicy: 'open' | 'vetted' | 'closed'
+}
+
+export type LandType = 'jungleClearing' | 'farmland' | 'pasture'
+
+export interface LandParcel {
+  id: string
+  type: LandType
+  hectares: number
+  productivity: number    // 0..1
+  purchaseYear: number
+}
+
+export type Building = 'clinic' | 'dairyPlant'
+
+export interface ColonyEconomy {
+  parcels: LandParcel[]
+  buildings: Building[]
 }
 
 export interface Colony {
+  id: number
   name: string
   population: PopulationStore
   doctrine: Doctrine
@@ -41,6 +83,11 @@ export interface Colony {
   treasury: number
   year: number
   history: YearSnapshot[]
+  foundingYear: number
+  modernityPressure: number
+  economy: ColonyEconomy
+  pairingRecords: Map<number, { coefficient: number }> // stableId -> inbreeding coefficient at pairing
+  flags: Record<string, unknown>
 }
 
 export interface YearSnapshot {
@@ -68,7 +115,7 @@ export interface ColonyMetrics {
   departuresThisYear: number
 }
 
-export type GameEventType = 'birth' | 'death' | 'departure' | 'pairing'
+export type GameEventType = 'birth' | 'death' | 'departure' | 'pairing' | 'inflow' | 'schism'
 
 export interface GameEvent {
   type: GameEventType
@@ -81,4 +128,36 @@ export interface TickResult {
   colony: Colony
   events: GameEvent[]
   metrics: ColonyMetrics
+}
+
+// Federation types
+export interface Federation {
+  year: number
+  colonies: Colony[]
+  modernWest: { willingness: number }
+  pendingSchisms: SchismEvent[]
+  history: FederationSnapshot[]
+}
+
+export interface FederationSnapshot {
+  year: number
+  totalPopulation: number
+  colonyCount: number
+  totalTreasury: number
+}
+
+export interface SchismEvent {
+  type: 'schism'
+  parentColonyId: number
+  direction: 'conservative' | 'liberal'
+  memberIds: number[] // stable IDs
+  proposedDoctrine: Doctrine
+  proposedName: string
+}
+
+// Save state V2
+export interface SaveStateV2 {
+  version: 2
+  seed: number
+  federation: Federation
 }
